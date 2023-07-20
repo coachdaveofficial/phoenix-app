@@ -9,6 +9,10 @@ class TeamService:
     @staticmethod
     def get_team_by_id(team_id):
         return Team.query.get(team_id)
+    
+    @staticmethod
+    def get_team_by_name(team_name):
+        return Team.query.filter_by(name=team_name).first()
 
 
 class PlayerService:
