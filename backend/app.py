@@ -1,5 +1,11 @@
-from flask import Flask
+import os
+
+from seed import seed_players
+from script import SeasonDataExtractor
+from models import connect_db, db
+from flask import Flask, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
+from services import PlayerService
 
 app = Flask(__name__)
 
@@ -19,3 +25,18 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 toolbar = DebugToolbarExtension(app)
 
 app.app_context().push()
+connect_db(app)
+# db.drop_all()
+db.create_all()
+
+
+extractor = SeasonDataExtractor("phoenix-fc-sheets-COPY.json", "Copy of Phoenix Historical Stats")
+
+
+
+
+
+
+
+# extractor.insert_data([{'worksheet': "Spring 2023 Open", "year": "2023", "season": "Spring", "team_type": "Open"}])
+# seed_players()
