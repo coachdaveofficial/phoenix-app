@@ -7,7 +7,10 @@ from flask import Flask, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from services import PlayerService
 
+from blueprints.players.players import players_bp
+
 app = Flask(__name__)
+app.register_blueprint(players_bp)
 
 # Get DB_URI from environ variable (useful for production/testing) or,
 # if not set there, use development local db.
@@ -40,3 +43,6 @@ extractor = SeasonDataExtractor("phoenix-fc-sheets-COPY.json", "Copy of Phoenix 
 
 # extractor.insert_data([{'worksheet': "Spring 2023 Open", "year": "2023", "season": "Spring", "team_type": "Open"}])
 # seed_players()
+
+if __name__ == "__app__":
+    app.run(debug=True)
