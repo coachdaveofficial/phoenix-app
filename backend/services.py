@@ -1,5 +1,5 @@
 
-from models import db, Team, Player, Match, Goal, Assist, Appearance
+from models import db, Team, Player, Match, Goal, Assist, Appearance, PositionType
 
 class TeamService:
     @staticmethod
@@ -16,6 +16,60 @@ class TeamService:
 
 
 class PlayerService:
+
+    @staticmethod
+    def jsonify_player(p):
+        position_mapping = {
+            PositionType.forward: "forward",
+            PositionType.midfielder: "midfielder",
+            PositionType.defender: "defender",
+            PositionType.goalkeeper: "goalkeeper",
+        }
+        return {
+                "id": p.id,
+                "player_name": f'{p.first_name} {p.last_name}',
+                "position": position_mapping.get(p.position),
+                "team": p.team.name,
+                "appearances": len([app for app in p.apps]),
+                "goals": len([g for g in p.goals]),
+                "assists": len([a for a in p.assists]),
+                "yellow_cards": len([y for y in p.yellow_cards]),
+                "red_cards": len([r for r in p.red_cards]),
+             }
+    @staticmethod
+    def create_player_from_json(json_data):
+        # Extract data from JSON
+        first_name = json_data.get('first_name')
+        last_name = json_data.get('last_name')
+        position_str = json_data.get('position')
+        team_id = json_data.get('team_id')
+
+
+        if not first_name or not last_name or not position_str or not team_id:
+            raise ValueError("Missing required fields")
+
+        # Convert the position string to the PositionType enum
+        position = getattr(PositionType, position_str.lower(), None)
+        if not position:
+            raise ValueError("Invalid position")
+        
+        existing_player = PlayerService.get_player_by_full_name(first_name=first_name, last_name=last_name)
+        if existing_player:
+            raise ValueError("Player by that name already exists")
+
+
+        player = Player(
+            first_name=first_name,
+            last_name=last_name,
+            position=position,
+            team_id=team_id
+        )
+
+        db.session.add(player)
+        db.session.commit()
+
+        return player
+
     @staticmethod
     def get_all_players():
         return Player.query.all()
@@ -35,6 +89,15 @@ class PlayerService:
     @staticmethod
     def get_appearances_by_player_id(player_id):
         return Appearance.query.filter_by(player_id=player_id).all()
+    
+    @staticmethod
+    def get_player_by_full_name(first_name, last_name):
+        player = Player.query.filter_by(first_name=first_name, last_name=last_name).first()
+            
+        if not player:
+            return None
+        
+        return player
 
 
 class MatchService:
