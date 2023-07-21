@@ -19,6 +19,7 @@ class PlayerService:
 
     @staticmethod
     def jsonify_player(p):
+        '''Turn Player object into a JSON format'''
         position_mapping = {
             PositionType.forward: "forward",
             PositionType.midfielder: "midfielder",
@@ -99,7 +100,69 @@ class PlayerService:
         
         return player
 
+    @staticmethod
+    def update_player(player, data):
+        '''Accepts Player object and JSON data for the fields that will be updated such as first_name, last_name, position, etc.'''
+                
+         # Update the player information based on the data provided
+        if "first_name" in data:
+            player.first_name = data["first_name"]
 
+        if "last_name" in data:
+            player.last_name = data["last_name"]
+
+        if "position" in data:
+            # Convert position string to the corresponding Enum value
+            position_str = data["position"]
+            position_enum = getattr(PositionType, position_str, None)
+
+            if not position_enum:
+                return False, {"message": "Invalid position value"}
+
+            player.position = position_enum
+
+        if "team_id" in data:
+            player.team_id = data["team_id"]
+
+        # Commit the changes to the database
+        try:
+            db.session.commit()
+            return True, {"message": "Player information updated successfully"}
+
+        except Exception as e:
+            db.session.rollback()
+            return False, {"message": "Failed to update player information"}
+
+    @staticmethod
+    def delete_player(player):
+        try:
+            db.session.delete(player)
+            db.session.commit()
+            return True, {"message": "Player deleted successfully"}
+        except Exception as e:
+            db.session.rollback()
+            return False, {"message": "Failed to delete player"}
+
+    @staticmethod
+    def filter_players(first_name=None, last_name=None, position=None, team=None):
+        query = Player.query
+
+        if first_name:
+            query = query.filter(Player.first_name.ilike(f'%{first_name}%'))
+
+        if last_name:
+            query = query.filter(Player.last_name.ilike(f'%{last_name}%'))
+
+        if position:
+            position_enum = PositionType[position]
+            query = query.filter(Player.position == position_enum)
+
+        if team:
+            query = query.join(Player.team).filter(Team.name.ilike(f'%{team}%'))
+
+        return query.all()
+
+            
 class MatchService:
     @staticmethod
     def get_all_matches():

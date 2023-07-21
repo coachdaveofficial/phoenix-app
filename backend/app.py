@@ -10,7 +10,7 @@ from services import PlayerService
 from blueprints.players.players import players_bp
 
 app = Flask(__name__)
-app.register_blueprint(players_bp)
+app.register_blueprint(players_bp, url_prefix='/api')
 
 # Get DB_URI from environ variable (useful for production/testing) or,
 # if not set there, use development local db.
