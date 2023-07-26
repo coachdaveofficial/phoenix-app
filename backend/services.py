@@ -1,8 +1,9 @@
-from sqlalchemy import func
+from sqlalchemy import func, desc
 from models import db, Team, Player, Match, Goal, Assist, Appearance, PositionType
+from datetime import date
 
 class TeamService:
-    @staticmethod
+    @classmethod
     def get_all_teams(team_name=None):
         # Get all teams or filter by name if provided
 
@@ -32,20 +33,20 @@ class TeamService:
         # Convert teams to JSON format
         return [TeamService.jsonify_team(team) for team in teams]
 
-    @staticmethod
+    @classmethod
     def get_team_by_id(team_id):
         team = Team.query.get(team_id)
         if not team:
             return False
         return team
     
-    @staticmethod
+    @classmethod
     def get_team_by_name(team_name):
         # Perform a case-insensitive search using ilike
         team = Team.query.filter(func.lower(Team.name).ilike(f'%{team_name.lower()}%')).first()
         return team
             
-    @staticmethod
+    @classmethod
     def jsonify_team(team):
         return {
             "id": team.id,
@@ -53,7 +54,7 @@ class TeamService:
             "players": [PlayerService.jsonify_player(p) for p in team.players],
         }
 
-    @staticmethod
+    @classmethod
     def update_team_name(team, data):
         '''Accepts Team object and JSON data containing the new team name'''
                 
@@ -72,7 +73,7 @@ class TeamService:
             db.session.rollback()
             return False, {"message": "Failed to update team name"}
 
-    @staticmethod
+    @classmethod
     def delete_team(team):
         try:
             db.session.delete(team)
@@ -83,7 +84,7 @@ class TeamService:
             return False, {"message": "Failed to delete team"}
 class PlayerService:
 
-    @staticmethod
+    @classmethod
     def jsonify_player(p):
         '''Turn Player object into a JSON format'''
         position_mapping = {
@@ -103,7 +104,7 @@ class PlayerService:
                 "yellow_cards": len([y for y in p.yellow_cards]),
                 "red_cards": len([r for r in p.red_cards]),
              }
-    @staticmethod
+    @classmethod
     def create_player_from_json(json_data):
         # Extract data from JSON
         first_name = json_data.get('first_name')
@@ -137,27 +138,20 @@ class PlayerService:
 
         return player
 
-    @staticmethod
+    @classmethod
     def get_all_players():
         return Player.query.all()
 
-    @staticmethod
+    @classmethod
     def get_player_by_id(player_id):
         return Player.query.get(player_id)
 
-    @staticmethod
-    def get_goals_by_player_id(player_id):
-        return Goal.query.filter_by(player_id=player_id).all()
-
-    @staticmethod
-    def get_assists_by_player_id(player_id):
-        return Assist.query.filter_by(player_id=player_id).all()
-
-    @staticmethod
-    def get_appearances_by_player_id(player_id):
-        return Appearance.query.filter_by(player_id=player_id).all()
+    @classmethod
+    def get_multiple_players_by_id(player_ids):
+        '''player_ids is a list of player_id values'''
+        return Player.query.filter(Player.id.in_(player_ids)).all()
     
-    @staticmethod
+    @classmethod
     def get_player_by_full_name(first_name, last_name):
         player = Player.query.filter_by(first_name=first_name, last_name=last_name).first()
             
@@ -166,7 +160,7 @@ class PlayerService:
         
         return player
 
-    @staticmethod
+    @classmethod
     def update_player(player, data):
         '''Accepts Player object and JSON data for the fields that will be updated such as first_name, last_name, position, etc.'''
                 
@@ -199,7 +193,7 @@ class PlayerService:
             db.session.rollback()
             return False, {"message": "Failed to update player information"}
 
-    @staticmethod
+    @classmethod
     def delete_player(player):
         try:
             db.session.delete(player)
@@ -209,7 +203,7 @@ class PlayerService:
             db.session.rollback()
             return False, {"message": "Failed to delete player"}
 
-    @staticmethod
+    @classmethod
     def filter_players(first_name=None, last_name=None, position=None, team=None):
         query = Player.query
 
@@ -228,46 +222,67 @@ class PlayerService:
 
         return query.all()
 
-            
+    @classmethod
+    def get_player_with_most_goals():
+        player_with_most_goals = (
+            Player.query
+            .join(Goal)
+            .group_by(Player.id)
+            .order_by(desc(Goal.id))  # Sort in descending order based on number of goals
+            .first()
+        )
+        return player_with_most_goals
+    
+    @classmethod
+    def get_player_with_most_assists():
+        player_with_most_assists = (
+            Player.query
+            .join(Assist)
+            .group_by(Player.id)
+            .order_by(desc(Assist.id))  # Sort in descending order based on number of assists
+            .first()
+        )
+        return player_with_most_assists
+    
+    @classmethod
+    def get_player_with_most_appearances():
+        player_with_most_appearances = (
+            Player.query
+            .join(Appearance)
+            .group_by(Player.id)
+            .order_by(desc(Appearance.id))  # Sort in descending order based on number of appearances
+            .first()
+        )
+        return player_with_most_appearances
 class MatchService:
-    @staticmethod
+    @classmethod
     def get_all_matches():
         return Match.query.all()
 
-    @staticmethod
+    @classmethod
     def get_match_by_id(match_id):
         return Match.query.get(match_id)
 
-    @staticmethod
+    @classmethod
     def get_goals_by_match_id(match_id):
         return Goal.query.filter_by(match_id=match_id).all()
 
-    @staticmethod
+    @classmethod
     def get_assists_by_match_id(match_id):
         return Assist.query.filter_by(match_id=match_id).all()
     
-    @staticmethod
+    @classmethod
     def get_match_score(match):
         """Calculate and return the score for the given match. Returns [home_team_score, away_team_score]"""
         home_team_score = sum(goal.points for goal in match.goals if goal.team_id == match.home_team_id)
         away_team_score = sum(goal.points for goal in match.goals if goal.team_id == match.away_team_id)
         return home_team_score, away_team_score
 
-
-
-class GoalService:
-    @staticmethod
-    def get_all_goals():
-        return Goal.query.all()
-
-
-class AssistService:
-    @staticmethod
-    def get_all_assists():
-        return Assist.query.all()
-
-
-class AppearanceService:
-    @staticmethod
-    def get_all_appearances():
-        return Appearance.query.all()
+    @classmethod
+    def get_matches_by_season(season_id):
+        return Match.query.filter_by(season_id=season_id).all()
+    
+    @classmethod
+    def get_matches_by_day(day):
+        '''day is a datetime.date object'''
+        return Match.query.filter(Match.date == day).all()
