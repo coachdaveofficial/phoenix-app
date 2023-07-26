@@ -52,7 +52,7 @@ def get_player(id):
     return make_response(jsonify(PlayerService.json_player(player)), 200)
            
 @players_bp.route("/players/<int:id>/", methods=["PUT", "DELETE"])
-def update_or_player(id):
+def update_or_delete_player(id):
 
     player = PlayerService.get_player_by_id(id)
     if not player:

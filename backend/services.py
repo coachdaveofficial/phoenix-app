@@ -1,20 +1,86 @@
-
+from sqlalchemy import func
 from models import db, Team, Player, Match, Goal, Assist, Appearance, PositionType
 
 class TeamService:
     @staticmethod
-    def get_all_teams():
-        return Team.query.all()
+    def get_all_teams(team_name=None):
+        # Get all teams or filter by name if provided
+
+        team_name_mapping = {
+            "open": "Phoenix FC Open",
+            "o30": "Phoenix FC O30",
+            "o40": "Phoenix FC O40",
+            "over 30": "Phoenix FC O30",
+            "over 40": "Phoenix FC O40",
+        }
+
+        # Check if the provided team_name matches any variation in the mapping
+        if team_name and team_name.lower() in team_name_mapping:
+            team_name = team_name_mapping[team_name.lower()]
+
+        if team_name:
+            # Retrieve a single team if team_name is provided
+            teams = [TeamService.get_team_by_name(team_name)]
+        else:
+            # Retrieve all teams when team_name is not provided
+            teams = Team.query.all()
+
+        # If search yields no results
+        if None in teams:
+            return False
+
+        # Convert teams to JSON format
+        return [TeamService.jsonify_team(team) for team in teams]
 
     @staticmethod
     def get_team_by_id(team_id):
-        return Team.query.get(team_id)
+        team = Team.query.get(team_id)
+        if not team:
+            return False
+        return team
     
     @staticmethod
     def get_team_by_name(team_name):
-        return Team.query.filter_by(name=team_name).first()
+        # Perform a case-insensitive search using ilike
+        team = Team.query.filter(func.lower(Team.name).ilike(f'%{team_name.lower()}%')).first()
+        return team
+            
+    @staticmethod
+    def jsonify_team(team):
+        return {
+            "id": team.id,
+            "name": team.name,
+            "players": [PlayerService.jsonify_player(p) for p in team.players],
+        }
 
+    @staticmethod
+    def update_team_name(team, data):
+        '''Accepts Team object and JSON data containing the new team name'''
+                
+         # Update the player information based on the data provided
+        if "name" in data:
+            team.name = data["name"]
+        else:
+            return False, {"message": "Must provide new name. Please try again."}
 
+        # Commit the changes to the database
+        try:
+            db.session.commit()
+            return True, {"message": "Team name updated successfully"}
+
+        except Exception as e:
+            db.session.rollback()
+            return False, {"message": "Failed to update team name"}
+
+    @staticmethod
+    def delete_team(team):
+        try:
+            db.session.delete(team)
+            db.session.commit()
+            return True, {"message": "Team deleted successfully"}
+        except Exception as e:
+            db.session.rollback()
+            return False, {"message": "Failed to delete team"}
 class PlayerService:
 
     @staticmethod

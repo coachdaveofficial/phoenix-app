@@ -8,9 +8,11 @@ from flask_debugtoolbar import DebugToolbarExtension
 from services import PlayerService
 
 from blueprints.players.players import players_bp
+from blueprints.teams.teams import teams_bp
 
 app = Flask(__name__)
 app.register_blueprint(players_bp, url_prefix='/api')
+app.register_blueprint(teams_bp, url_prefix='/api')
 
 # Get DB_URI from environ variable (useful for production/testing) or,
 # if not set there, use development local db.
