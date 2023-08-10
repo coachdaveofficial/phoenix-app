@@ -124,6 +124,10 @@ class Appearance(db.Model):
         db.Integer,
         db.ForeignKey('seasons.id')
     )
+    match_id = db.Column(
+        db.Integer,
+        db.ForeignKey('matches.id')
+    )
 
 class YellowCards(db.Model):
     """Yellow cards received by Phoenix FC players"""
