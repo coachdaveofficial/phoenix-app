@@ -1,5 +1,5 @@
 from sqlalchemy import func, desc
-from models import db, Team, Player, Match, Goal, Assist, Appearance, PositionType
+from models import db, Team, Player, Match, Goal, Assist, Appearance, PositionType, Season
 from datetime import date
 
 class TeamService:
@@ -285,6 +285,32 @@ class PlayerService:
             .all()
         )
         return players_with_most_appearances
+    
+    @staticmethod
+    def get_player_stats_by_season(player_id, season_id):
+        player = Player.query.get(player_id)
+        if not player:
+            return None
+
+        season = Season.query.get(season_id)
+        if not season:
+            return None
+
+        matches_in_season = Match.query.filter_by(season_id=season_id).all()
+
+        goals = Goal.query.filter(Goal.player_id == player_id, Goal.match_id.in_([match.id for match in matches_in_season])).count()
+        assists = Assist.query.filter(Assist.player_id == player_id, Assist.match_id.in_([match.id for match in matches_in_season])).count()
+        appearances = Appearance.query.filter(Appearance.player_id == player_id, Appearance.match_id.in_([match.id for match in matches_in_season])).count()
+
+        player_stats = {
+            "player_name": f"{player.first_name} {player.last_name}",
+            "season_name": season.name,
+            "goals": goals,
+            "assists": assists,
+            "appearances": appearances,
+        }
+
+        return player_stats
 class MatchService:
     @staticmethod
     def get_all_matches():

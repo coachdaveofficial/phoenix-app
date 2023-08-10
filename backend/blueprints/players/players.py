@@ -124,3 +124,11 @@ def get_most_apps():
         return make_response(jsonify(json_players), 200)
 
     return make_response(jsonify(PlayerService.jsonify_player(most_apps)), 200)
+
+@players_bp.route("/players/<int:player_id>/season/<int:season_id>", methods=["GET"])
+def get_player_stats_by_season(player_id, season_id):
+    player_stats = PlayerService.get_player_stats_by_season(player_id, season_id)
+    if not player_stats:
+        return jsonify({"message": "Error finding player stats. Please provide valid player ID and season ID"}), 404
+    
+    return make_response(jsonify(player_stats), 200)
