@@ -3,7 +3,7 @@ from models import db, Team, Player, Match, Goal, Assist, Appearance, PositionTy
 from datetime import date
 
 class TeamService:
-    @classmethod
+    @staticmethod
     def get_all_teams(team_name=None):
         # Get all teams or filter by name if provided
 
@@ -33,20 +33,20 @@ class TeamService:
         # Convert teams to JSON format
         return [TeamService.jsonify_team(team) for team in teams]
 
-    @classmethod
+    @staticmethod
     def get_team_by_id(team_id):
         team = Team.query.get(team_id)
         if not team:
             return False
         return team
     
-    @classmethod
+    @staticmethod
     def get_team_by_name(team_name):
         # Perform a case-insensitive search using ilike
         team = Team.query.filter(func.lower(Team.name).ilike(f'%{team_name.lower()}%')).first()
         return team
             
-    @classmethod
+    @staticmethod
     def jsonify_team(team):
         return {
             "id": team.id,
@@ -54,7 +54,7 @@ class TeamService:
             "players": [PlayerService.jsonify_player(p) for p in team.players],
         }
 
-    @classmethod
+    @staticmethod
     def update_team_name(team, data):
         '''Accepts Team object and JSON data containing the new team name'''
                 
@@ -73,7 +73,7 @@ class TeamService:
             db.session.rollback()
             return False, {"message": "Failed to update team name"}
 
-    @classmethod
+    @staticmethod
     def delete_team(team):
         try:
             db.session.delete(team)
@@ -84,7 +84,7 @@ class TeamService:
             return False, {"message": "Failed to delete team"}
 class PlayerService:
 
-    @classmethod
+    @staticmethod
     def jsonify_player(p):
         '''Turn Player object into a JSON format'''
         position_mapping = {
@@ -104,7 +104,7 @@ class PlayerService:
                 "yellow_cards": len([y for y in p.yellow_cards]),
                 "red_cards": len([r for r in p.red_cards]),
              }
-    @classmethod
+    @staticmethod
     def create_player_from_json(json_data):
         # Extract data from JSON
         first_name = json_data.get('first_name')
@@ -138,20 +138,20 @@ class PlayerService:
 
         return player
 
-    @classmethod
+    @staticmethod
     def get_all_players():
         return Player.query.all()
 
-    @classmethod
+    @staticmethod
     def get_player_by_id(player_id):
         return Player.query.get(player_id)
 
-    @classmethod
+    @staticmethod
     def get_multiple_players_by_id(player_ids):
         '''player_ids is a list of player_id values'''
         return Player.query.filter(Player.id.in_(player_ids)).all()
     
-    @classmethod
+    @staticmethod
     def get_player_by_full_name(first_name, last_name):
         player = Player.query.filter_by(first_name=first_name, last_name=last_name).first()
             
@@ -160,7 +160,7 @@ class PlayerService:
         
         return player
 
-    @classmethod
+    @staticmethod
     def update_player(player, data):
         '''Accepts Player object and JSON data for the fields that will be updated such as first_name, last_name, position, etc.'''
                 
@@ -193,7 +193,7 @@ class PlayerService:
             db.session.rollback()
             return False, {"message": "Failed to update player information"}
 
-    @classmethod
+    @staticmethod
     def delete_player(player):
         try:
             db.session.delete(player)
@@ -203,7 +203,7 @@ class PlayerService:
             db.session.rollback()
             return False, {"message": "Failed to delete player"}
 
-    @classmethod
+    @staticmethod
     def filter_players(first_name=None, last_name=None, position=None, team=None):
         query = Player.query
 
@@ -222,67 +222,98 @@ class PlayerService:
 
         return query.all()
 
-    @classmethod
+    @staticmethod
     def get_player_with_most_goals():
-        player_with_most_goals = (
+        
+        most_goals_count = (
             Player.query
             .join(Goal)
             .group_by(Player.id)
-            .order_by(desc(Goal.id))  # Sort in descending order based on number of goals
+            .with_entities(Player.id, func.count(Goal.id).label('goals_count'))
+            .order_by(desc(func.count(Goal.id)))
             .first()
+            .goals_count
         )
-        return player_with_most_goals
+
+        players_with_most_goals = (
+            Player.query
+            .join(Goal)
+            .group_by(Player.id)
+            .having(func.count(Goal.id) == most_goals_count)
+            .all()
+        )
+        return players_with_most_goals
     
-    @classmethod
+    @staticmethod
     def get_player_with_most_assists():
-        player_with_most_assists = (
+        most_assists_count = (
             Player.query
             .join(Assist)
             .group_by(Player.id)
-            .order_by(desc(Assist.id))  # Sort in descending order based on number of assists
+            .with_entities(Player.id, func.count(Assist.id).label('assists_count'))
+            .order_by(desc(func.count(Assist.id)))
             .first()
+            .assists_count
         )
-        return player_with_most_assists
+
+        players_with_most_assists = (
+            Player.query
+            .join(Assist)
+            .group_by(Player.id)
+            .having(func.count(Assist.id) == most_assists_count)
+            .all()
+        )
+        return players_with_most_assists
     
-    @classmethod
+    @staticmethod
     def get_player_with_most_appearances():
-        player_with_most_appearances = (
+        most_appearances_count = (
             Player.query
             .join(Appearance)
             .group_by(Player.id)
-            .order_by(desc(Appearance.id))  # Sort in descending order based on number of appearances
+            .with_entities(Player.id, func.count(Appearance.id).label('appearances_count'))
+            .order_by(desc(func.count(Appearance.id)))
             .first()
+            .appearances_count
         )
-        return player_with_most_appearances
+
+        players_with_most_appearances = (
+            Player.query
+            .join(Appearance)
+            .group_by(Player.id)
+            .having(func.count(Appearance.id) == most_appearances_count)
+            .all()
+        )
+        return players_with_most_appearances
 class MatchService:
-    @classmethod
+    @staticmethod
     def get_all_matches():
         return Match.query.all()
 
-    @classmethod
+    @staticmethod
     def get_match_by_id(match_id):
         return Match.query.get(match_id)
 
-    @classmethod
+    @staticmethod
     def get_goals_by_match_id(match_id):
         return Goal.query.filter_by(match_id=match_id).all()
 
-    @classmethod
+    @staticmethod
     def get_assists_by_match_id(match_id):
         return Assist.query.filter_by(match_id=match_id).all()
     
-    @classmethod
+    @staticmethod
     def get_match_score(match):
         """Calculate and return the score for the given match. Returns [home_team_score, away_team_score]"""
         home_team_score = sum(goal.points for goal in match.goals if goal.team_id == match.home_team_id)
         away_team_score = sum(goal.points for goal in match.goals if goal.team_id == match.away_team_id)
         return home_team_score, away_team_score
 
-    @classmethod
+    @staticmethod
     def get_matches_by_season(season_id):
         return Match.query.filter_by(season_id=season_id).all()
     
-    @classmethod
+    @staticmethod
     def get_matches_by_day(day):
         '''day is a datetime.date object'''
         return Match.query.filter(Match.date == day).all()
