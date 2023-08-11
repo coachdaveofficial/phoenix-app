@@ -2,17 +2,19 @@ import os
 
 from seed import seed_players
 from script import SeasonDataExtractor
-from models import connect_db, db
-from flask import Flask, request, jsonify
+from models import connect_db, db, User
+from flask import Flask, request, jsonify, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from services import PlayerService
 
 from blueprints.players.players import players_bp
 from blueprints.teams.teams import teams_bp
+from blueprints.auth.auth import auth_bp, CURR_USER_KEY
 
 app = Flask(__name__)
 app.register_blueprint(players_bp, url_prefix='/api')
 app.register_blueprint(teams_bp, url_prefix='/api')
+app.register_blueprint(auth_bp, url_prefix='/')
 
 # Get DB_URI from environ variable (useful for production/testing) or,
 # if not set there, use development local db.
@@ -34,6 +36,17 @@ connect_db(app)
 # db.drop_all()
 db.create_all()
 
+@app.before_request
+def add_user_to_g():
+    """If we're logged in, add curr user to Flask global."""
+
+    if CURR_USER_KEY in session:
+        g.user = User.query.get(session[CURR_USER_KEY])
+
+    else:
+        g.user = None
+
+    print(g.user)
 
 extractor = SeasonDataExtractor("phoenix-fc-sheets-COPY.json", "Copy of Phoenix Historical Stats")
 
