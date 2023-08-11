@@ -17,7 +17,36 @@ class PositionType(enum.Enum):
     forward = 4
 
 
+class User(db.Model):
+    """User in the system."""
 
+    __tablename__ = 'users'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
+    email = db.Column(
+        db.Text,
+        nullable=False,
+        unique=True,
+    )
+    username = db.Column(
+        db.Text,
+        nullable=False,
+        unique=True,
+    )
+    password = db.Column(
+        db.Text,
+        nullable=False,
+    )
+    is_admin = db.Column(
+        db.Boolean,
+        default=False
+    )
+
+    def __repr__(self):
+        return f"<User #{self.id}: {self.username}, {self.email}>"
 
 
 class Team(db.Model):
