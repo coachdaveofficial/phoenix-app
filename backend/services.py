@@ -1,6 +1,10 @@
 from sqlalchemy import func, desc
-from models import db, Team, Player, Match, Goal, Assist, Appearance, PositionType, Season
+from models import db, Team, Player, Match, Goal, Assist, Appearance, PositionType, Season, User
 from datetime import date
+from sqlalchemy.exc import IntegrityError
+from flask_bcrypt import Bcrypt
+
+bcrypt = Bcrypt()
 
 class TeamService:
     @staticmethod
@@ -343,3 +347,47 @@ class MatchService:
     def get_matches_by_day(day):
         '''day is a datetime.date object'''
         return Match.query.filter(Match.date == day).all()
+
+class UserService:
+    """Services for getting user info"""
+
+    @classmethod
+    def signup(cls, username, email, password):
+        """Sign up user.
+
+        Hashes password and adds user to system.
+        """
+
+        hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
+
+        try:
+            user = User(
+                username=username,
+                email=email,
+                password=hashed_pwd
+            )
+
+            db.session.add(user)
+            db.session.commit()
+            return user
+        except IntegrityError:
+            return None
+        
+    @classmethod
+    def authenticate(cls, username, password):
+        """Find user with `username` and `password`.
+
+        This is a class method (call it on the class, not an individual user.)
+        It searches for a user whose password hash matches this password
+        and, if it finds such a user, returns that user object.
+
+        If can't find matching user (or if password is wrong), returns False.
+        """
+
+        user = User.query.filter_by(username=username).first()
+
+        if user:
+            is_auth = bcrypt.check_password_hash(user.password, password)
+            if is_auth:
+                return user
+        return False
