@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, make_response, request
 from services import TeamService
 from models import PositionType
+from blueprints.auth.auth import login_required
 
 teams_bp = Blueprint("teams", __name__)
 
@@ -15,7 +16,7 @@ def teams():
         teams_list = TeamService.get_all_teams()
 
     if not teams_list:
-        return make_response(jsonify({"error": "Team(s) not found."}), 404)
+        return make_response(jsonify({"message": "Team(s) not found."}), 404)
     
     result = []
     for t in teams_list:
@@ -30,10 +31,11 @@ def get_team(team_id):
     try: 
         return make_response(jsonify(TeamService.jsonify_team(team)), 200)
     except Exception as e:
-        return make_response(jsonify({"error": "Team not found."}), 404)
+        return make_response(jsonify({"message": "Team not found."}), 404)
 
         
 @teams_bp.route("/teams/<int:team_id>", methods=["DELETE", "PUT"])
+@login_required
 def update_or_delete_team(team_id):
     team = TeamService.get_team_by_id(team_id)
     if not team:
