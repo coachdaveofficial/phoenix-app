@@ -139,3 +139,35 @@ def get_player_stats_by_season(player_id, season_id):
         return jsonify({"message": "Error finding player stats. Please provide valid player ID and season ID"}), 404
     
     return make_response(jsonify(player_stats), 200)
+
+@players_bp.route("/players/<int:player_id>/goal", methods=["POST"])
+@login_required
+def add_goal_for_player(player_id):
+    goal_data = request.get_json()
+    match_id = goal_data.get("match_id")
+    assisted_by_id = goal_data.get("assisted_by_id")
+
+    goal = PlayerService.add_goal_for_player(player_id, match_id, assisted_by_id)
+    
+    if not goal:
+        return make_response({"message": "Error adding goal, please review your data submission and try again"}, 400)
+    
+    return make_response({"message": "Goal successfully added"}, 201)
+
+@players_bp.route("/players/<int:player_id>/app", methods=["POST"])
+@login_required
+def add_appearance_for_player(player_id):
+    goal_data = request.get_json()
+    match_id = goal_data.get("match_id")
+    season_id = goal_data.get("season_id")
+
+    
+
+    app = PlayerService.add_appearance_for_player(player_id, match_id, season_id)
+    
+    if not app:
+        return make_response({"message": "Error adding appearance, please review your data submission and try again"}, 400)
+    
+    return make_response({"message": "Appearance successfully added"}, 201)
+
+    
