@@ -296,11 +296,11 @@ class PlayerService:
         if not player:
             return None
 
-        season = Season.query.get(season_id)
+        season = SeasonService.get_season_by_id(season_id)
         if not season:
             return None
 
-        matches_in_season = Match.query.filter_by(season_id=season_id).all()
+        matches_in_season = MatchService.get_matches_by_season_id(season_id)
 
         goals = Goal.query.filter(Goal.player_id == player_id, Goal.match_id.in_([match.id for match in matches_in_season])).count()
         assists = Assist.query.filter(Assist.player_id == player_id, Assist.match_id.in_([match.id for match in matches_in_season])).count()
@@ -315,6 +315,56 @@ class PlayerService:
         }
 
         return player_stats
+    
+    @staticmethod
+    def add_goal_for_player(player_id, match_id, assisted_by_id):
+        # Get the player and match objects
+        player = PlayerService.get_player_by_id(player_id)
+        match = MatchService.get_match_by_id(match_id)
+        assister = PlayerService.get_player_by_id(assisted_by_id)
+
+        if not player or not match:
+            return None
+        
+        # Create a new Goal instance
+        goal = Goal(player_id=player_id, match_id=match_id)
+        
+        # Update the player's goals and the match's goals
+        player.goals.append(goal)
+        match.goals.append(goal)
+
+        db.session.add(goal)
+        db.session.commit()
+
+        if assister:
+            assist = Assist(player_id=player_id, match_id=match_id, for_goal_id=goal.id)
+            db.session.add(assist)
+            db.session.commit()
+        
+        return goal 
+           
+    @staticmethod
+    def add_appearance_for_player(player_id, match_id, season_id):
+        # Get the player and match objects
+        player = PlayerService.get_player_by_id(player_id)
+        season = SeasonService.get_season_by_id(season_id)
+        match = MatchService.get_match_by_id(match_id)
+        
+        if not player or not season or not match:
+            return None
+        
+        # Create a new Appearance instance
+        app = Appearance(player_id=player_id, match_id=match_id, season_id=season_id)
+        
+        # Update the player's appearances
+        player.apps.append(app)
+
+        db.session.add(app)
+        db.session.commit()
+        
+        return app  
+             
+
 class MatchService:
     @staticmethod
     def get_all_matches():
@@ -340,7 +390,7 @@ class MatchService:
         return home_team_score, away_team_score
 
     @staticmethod
-    def get_matches_by_season(season_id):
+    def get_matches_by_season_id(season_id):
         return Match.query.filter_by(season_id=season_id).all()
     
     @staticmethod
@@ -391,3 +441,14 @@ class UserService:
             if is_auth:
                 return user
         return False
+    
+class SeasonService:
+    """Services for getting season info"""
+
+    @staticmethod
+    def get_season_by_id(season_id):
+        season = Season.query.get(season_id)
+
+        if not season:
+            return None
+        return season
