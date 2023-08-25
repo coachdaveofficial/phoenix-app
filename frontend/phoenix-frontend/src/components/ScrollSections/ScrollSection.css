@@ -1,10 +1,7 @@
 .scroll-section {
     height: 100%;
     min-height: 100vh;
-    font-size: 20px;
-    font-family: Times;
     padding-top: 250px;
     margin: 0px;
-    text-align: center;
-    color: white;
+
 }

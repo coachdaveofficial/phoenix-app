@@ -4,7 +4,7 @@ import NavbarLink from './NavbarLink';
 import NavLogo from './NavLogo';
 
 
-
+const logoUrl = 'https://scontent.fhio2-2.fna.fbcdn.net/v/t39.30808-6/327021022_495844319156343_4404772642969112146_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=G6_0DOJyr_sAX-OhW0_&_nc_ht=scontent.fhio2-2.fna&oh=00_AfC-ws7dDX3umOjvBheZBO-cr8nZgSGeTqZF7jqtiRDTXQ&oe=64E50846'
 
 
 export default function NavBarFunc() {
@@ -22,7 +22,7 @@ export default function NavBarFunc() {
         <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 left-0 border-b border-gray-200 dark:border-gray-600">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                 <NavLogo 
-                imgSrc={'https://scontent.fhio2-2.fna.fbcdn.net/v/t39.30808-6/327021022_495844319156343_4404772642969112146_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=G6_0DOJyr_sAX-OhW0_&_nc_ht=scontent.fhio2-2.fna&oh=00_AfC-ws7dDX3umOjvBheZBO-cr8nZgSGeTqZF7jqtiRDTXQ&oe=64E50846'} 
+                imgSrc={logoUrl} 
                 text={"Phoenix FC"}
                 altText={"Phoenix FC Logo"}
                 />
