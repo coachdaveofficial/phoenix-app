@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Tab from './Tab';
 import CardContent from './CardContent';
 
 
 const logoUrl = 'https://scontent.fhio2-2.fna.fbcdn.net/v/t39.30808-6/327021022_495844319156343_4404772642969112146_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=G6_0DOJyr_sAX-OhW0_&_nc_ht=scontent.fhio2-2.fna&oh=00_AfC-ws7dDX3umOjvBheZBO-cr8nZgSGeTqZF7jqtiRDTXQ&oe=64E50846'
+
+import axios from "axios";
+const API_BASE_URL = 'http://127.0.0.1:5000/api';
 
 export default function MatchCard() {
     const [activeTab, setActiveTab] = useState('Upcoming');
@@ -11,6 +14,7 @@ export default function MatchCard() {
     const handleTabClick = (tab) => {
         setActiveTab(tab);
     };
+    
 
     return (
         <div className="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">

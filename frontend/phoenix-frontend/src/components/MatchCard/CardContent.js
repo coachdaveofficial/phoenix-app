@@ -1,5 +1,5 @@
 import React from 'react';
-// const defaultLogo = "https://www.seekpng.com/png/detail/28-289657_espn-soccer-team-logo-default.png"
+
 const defaultLogo = "https://static.vecteezy.com/system/resources/thumbnails/005/513/063/small_2x/soccer-ball-outline-icon-illustration-on-white-background-free-vector.jpg"
 const imgClass = "rounded-full w-auto h-auto xs:h:10 sm:h-10 md:h-20 lg:h-20 xl:h-20 w-auto xs:w:10 sm:w-10 md:w-20 lg:w-20 xl:w-20"
 const teamNameClass = "mb-2 xl:text-2xl lg:text-xl md:text-lg sm:text-md xs:text-sm font-bold tracking-tight text-gray-900 dark:text-white"
