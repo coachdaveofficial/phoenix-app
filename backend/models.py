@@ -112,6 +112,10 @@ class Goal(db.Model):
         db.Integer,
         db.ForeignKey('matches.id')
     )
+    team_id = db.Column(
+        db.Integer,
+        db.ForeignKey("teams.id")
+    )
 
 
 class Assist(db.Model):
