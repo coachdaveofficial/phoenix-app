@@ -383,7 +383,7 @@ class MatchService:
         json_season = SeasonService.jsonify_season(match.season)
         json_home = TeamService.jsonify_team(match.home_team)
         json_away = TeamService.jsonify_team(match.away_team)
-        home_score, away_score = MatchService.get_match_score(match)
+        match_score = MatchService.parse_score(match.score)
 
         return {
             "match_id": match.id,
@@ -392,9 +392,8 @@ class MatchService:
             "season": json_season,
             "home_team": json_home,
             "away_team": json_away,
-            "score": {"home": home_score, "away": away_score}
-
-
+            "score": match_score,
+            "goals": GoalService.jsonify_goal_scorers_and_assisters_by_match_id(match.id)
         }
 
     @staticmethod
@@ -414,18 +413,30 @@ class MatchService:
         return Assist.query.filter_by(match_id=match_id).all()
 
     @staticmethod
-    def get_match_score(match):
-        """Calculate and return the score for the given match. Returns [home_team_score, away_team_score]"""
-        home_team_score = 0
-        away_team_score = 0
-        for goal in match.goals:
-            if goal.team_id == match.home_team_id:
-                home_team_score += 1
-            if goal.team_id == match.away_team_id:
-                away_team_score += 1
-        # home_team_score = sum(goal for goal in match.goals if goal.team_id == match.home_team_id)
-        # away_team_score = sum(goal for goal in match.goals if goal.team_id == match.away_team_id)
-        return home_team_score, away_team_score
+    def parse_score(score_str):
+        '''Given a score string of "1:4" will return {'home': '1', 'away': '4', 'forfeit': False}'''
+        # Split the score string by ':'
+        scores = score_str.split(":")
+        
+        if len(scores) != 2:
+            # Handle invalid score format
+            return None
+
+        home_score, away_score = scores
+        
+        if "forfeit" in away_score:
+            # Handle forfeit result
+            away_score = away_score.split("forfeit")[0]
+            forfeit = True
+        else:
+            forfeit = False
+
+        return {
+            "home": home_score.strip(),
+            "away": away_score.strip(),
+            "forfeit": forfeit,
+        }
+
 
     @staticmethod
     def get_matches_by_season_id(season_id):
@@ -529,3 +540,47 @@ class SeasonService:
         if not season:
             return None
         return season
+
+class GoalService:
+    @staticmethod
+    def jsonify_goal_scorers_and_assisters_by_match_id(match_id):
+        # Query the goals and assists for the given match
+        goals_and_assists = (
+            db.session.query(Goal, Assist)
+            .filter(Goal.match_id == match_id)
+            .join(Assist, Goal.id == Assist.for_goal_id, isouter=True)
+            .all()
+        )
+
+        # Create lists to store goal scorer and assister data in JSON format
+        goal_scorers = []
+        assisters = []
+
+        # Iterate through the goals and fetch player data
+        for goal, assist in goals_and_assists:
+            if goal:
+                player = goal.players
+                if player:
+                    goal_scorers.append({
+                        "player_id": player.id,
+                        "first_name": player.first_name,
+                        "last_name": player.last_name,
+                        "team_id": player.team_id,
+                        "team_name": player.team.name if player.team else None,
+                    })
+
+            if assist:
+                player = assist.players
+                if player:
+                    assisters.append({
+                        "player_id": player.id,
+                        "first_name": player.first_name,
+                        "last_name": player.last_name,
+                        "team_id": player.team_id,
+                        "team_name": player.team.name if player.team else None,
+                    })
+
+        return {
+            "goal_scorers": goal_scorers,
+            "assisters": assisters,
+        }
