@@ -6,15 +6,21 @@ from models import connect_db, db, User
 from flask import Flask, request, jsonify, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from services import PlayerService
+from flask_cors import CORS, cross_origin
 
 from blueprints.players.players import players_bp
 from blueprints.teams.teams import teams_bp
+from blueprints.matches.matches import matches_bp
 from blueprints.auth.auth import auth_bp, CURR_USER_KEY
 
 app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 app.register_blueprint(players_bp, url_prefix='/api')
 app.register_blueprint(teams_bp, url_prefix='/api')
+app.register_blueprint(matches_bp, url_prefix='/api')
 app.register_blueprint(auth_bp, url_prefix='/')
+
+
 
 # Get DB_URI from environ variable (useful for production/testing) or,
 # if not set there, use development local db.
@@ -41,7 +47,8 @@ def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
 
     if CURR_USER_KEY in session:
-        g.user = User.query.get(session[CURR_USER_KEY])
+        # g.user = User.query.get(session[CURR_USER_KEY])
+        g.user = db.session(User).get(session[CURR_USER_KEY])
 
     else:
         g.user = None
@@ -59,5 +66,5 @@ extractor = SeasonDataExtractor("phoenix-fc-sheets-COPY.json", "Copy of Phoenix 
 # extractor.insert_data([{'worksheet': "Spring 2023 Open", "year": "2023", "season": "Spring", "team_type": "Open"}])
 # seed_players()
 
-if __name__ == "__app__":
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True, port=8080)
