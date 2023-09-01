@@ -263,6 +263,9 @@ class Match(db.Model):
         db.ForeignKey('teams.id'),
         nullable=False
     )
+    score = db.Column(
+        db.Text
+    )
 
     home_team = db.relationship('Team', 
                                 foreign_keys=[home_team_id], 
