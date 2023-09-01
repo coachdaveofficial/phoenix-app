@@ -162,12 +162,13 @@ class SeasonDataExtractor:
                 
                 # Create a match
                 match = Match(
-                    id=int(game['game_id']),
+                    # id=int(game['game_id']),
                     date=match_datetime,
                     venue=game['location'],
                     season_id=season.id,
                     home_team_id=home_team.id,
-                    away_team_id=away_team.id
+                    away_team_id=away_team.id,
+                    score=game['score']
                 )
                 db.session.add(match)
                 db.session.commit()
