@@ -1,20 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import Tab from './Tab';
 import CardContent from './CardContent';
+import organizeMatchData from '@/helpers/organizeMatchData';
 
 
-const logoUrl = 'https://scontent.fhio2-2.fna.fbcdn.net/v/t39.30808-6/327021022_495844319156343_4404772642969112146_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=G6_0DOJyr_sAX-OhW0_&_nc_ht=scontent.fhio2-2.fna&oh=00_AfC-ws7dDX3umOjvBheZBO-cr8nZgSGeTqZF7jqtiRDTXQ&oe=64E50846'
+const logoUrl = '/phoenixfc_logo.jpeg'
 
 import axios from "axios";
-const API_BASE_URL = 'http://127.0.0.1:5000/api';
+const API_BASE_URL = 'http://127.0.0.1:8080/api';
 
-export default function MatchCard() {
+export default function MatchCard({phoenixTeam}) {
     const [activeTab, setActiveTab] = useState('Upcoming');
+    const [prevData, setPrevData] = useState(null);
+    const [upcomingData, setUpcomingData] = useState(null);
 
     const handleTabClick = (tab) => {
         setActiveTab(tab);
     };
-    
+
+    useEffect(() => {
+        const getTeamData = async () => {
+            const phoenixTeamResp = await axios.get(`${API_BASE_URL}/teams/?name=${phoenixTeam}`);
+            const phoenixTeamObj = phoenixTeamResp.data[0];
+            console.log(phoenixTeamObj)
+            const prevMatchResp = await axios.get(`${API_BASE_URL}/matches/${phoenixTeamObj.id}/previous`);
+            setPrevData(organizeMatchData(prevMatchResp.data));
+
+            try {
+                const upcomingMatchResp = await axios.get(`${API_BASE_URL}/matches/${phoenixTeamObj.id}/upcoming`);
+                console.log(upcomingData)
+                setUpcomingData(organizeMatchData(upcomingMatchResp))
+            } catch (e) {
+                setUpcomingData(false)
+            }
+
+        }
+        getTeamData();
+    }, [])
 
     return (
         <div className="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
@@ -54,11 +76,41 @@ export default function MatchCard() {
                 </ul>
             </div>
             <div className="">
-                <CardContent isActive={activeTab === 'Upcoming'} phoenixLogo={logoUrl} phoenixTeam={"Open"} opposingTeam={"Test FC"}>
-                    
-                </CardContent>
-                <CardContent isActive={activeTab === 'Previous'}>
-                </CardContent>
+            {upcomingData ? 
+                    <CardContent 
+                        isActive={activeTab === 'Upcoming'} 
+                        phoenixLogo={logoUrl} 
+                        phoenixTeam={phoenixTeam} 
+                        opposingTeam={prevData.opposingTeam.name}
+                        score={`${prevData.score}`} 
+                        location={prevData.location}
+                        date={prevData.date}
+                        time={prevData.time}
+                    /> 
+                    :
+                    <CardContent 
+                        isActive={activeTab === 'Upcoming'} 
+                        phoenixLogo={logoUrl} 
+                        phoenixTeam={phoenixTeam} 
+                        // opposingTeam={prevData.opposingTeam.name}
+                        // score={`${prevData.score}`} 
+                        location={"no info yet"}
+                        // date={prevData.date}
+                        // time={prevData.time}
+                    /> 
+                }
+                {prevData && 
+                    <CardContent 
+                        isActive={activeTab === 'Previous'} 
+                        phoenixLogo={logoUrl} 
+                        phoenixTeam={phoenixTeam} 
+                        opposingTeam={prevData.opposingTeam.name}
+                        score={`${prevData.score}`} 
+                        location={prevData.location}
+                        date={prevData.date}
+                        time={prevData.time}
+                    />
+                }
                 <CardContent isActive={activeTab === 'History'}>
                 </CardContent>
             </div>
