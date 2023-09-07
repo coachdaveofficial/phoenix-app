@@ -9,9 +9,9 @@ export default function Homepage() {
     <>
       <NavBarFunc />
       <ScrollSection sectionId={'section-one'} text={"1"} bgColor={"blue"}>
-        <MatchCard />
-        <MatchCard />
-        <MatchCard />
+        <MatchCard phoenixTeam={"Open"}/>
+        <MatchCard phoenixTeam={"O30"}/>
+        <MatchCard phoenixTeam={"o40"}/>
       </ScrollSection>
       <ScrollSection sectionId={'section-two'} text={"2"} bgColor={"orange"} />
     </>
