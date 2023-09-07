@@ -4,7 +4,7 @@ import NavbarLink from './NavbarLink';
 import NavLogo from './NavLogo';
 
 
-const logoUrl = 'https://scontent.fhio2-2.fna.fbcdn.net/v/t39.30808-6/327021022_495844319156343_4404772642969112146_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=G6_0DOJyr_sAX-OhW0_&_nc_ht=scontent.fhio2-2.fna&oh=00_AfC-ws7dDX3umOjvBheZBO-cr8nZgSGeTqZF7jqtiRDTXQ&oe=64E50846'
+const logoUrl = '/phoenixfc_logo.jpeg'
 
 
 export default function NavBarFunc() {
