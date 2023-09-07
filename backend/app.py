@@ -1,6 +1,6 @@
 import os
 
-from seed import seed_players
+from seed import seed_players, seed_o30
 from script import SeasonDataExtractor
 from models import connect_db, db, User
 from flask import Flask, request, jsonify, session, g
@@ -47,8 +47,8 @@ def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
 
     if CURR_USER_KEY in session:
-        # g.user = User.query.get(session[CURR_USER_KEY])
-        g.user = db.session(User).get(session[CURR_USER_KEY])
+        g.user = User.query.get(session[CURR_USER_KEY])
+        # g.user = db.session(User).get(session[CURR_USER_KEY])
 
     else:
         g.user = None
@@ -60,10 +60,11 @@ extractor = SeasonDataExtractor("phoenix-fc-sheets-COPY.json", "Copy of Phoenix 
 
 
 
-
+# seed_o30()
 
 
 # extractor.insert_data([{'worksheet': "Spring 2023 Open", "year": "2023", "season": "Spring", "team_type": "Open"}])
+# extractor.insert_data([{'worksheet': "Spring 2023 O30", "year": "2023", "season": "Spring", "team_type": "O30"}])
 # seed_players()
 
 if __name__ == "__main__":
