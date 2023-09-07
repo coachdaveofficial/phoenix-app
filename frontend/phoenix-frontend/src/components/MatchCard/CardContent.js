@@ -1,9 +1,19 @@
 import React from 'react';
 
 const defaultLogo = "https://static.vecteezy.com/system/resources/thumbnails/005/513/063/small_2x/soccer-ball-outline-icon-illustration-on-white-background-free-vector.jpg"
-const imgClass = "rounded-full w-auto h-auto xs:h:10 sm:h-10 md:h-20 lg:h-20 xl:h-20 w-auto xs:w:10 sm:w-10 md:w-20 lg:w-20 xl:w-20"
+const imgClass = "rounded-full w-auto h-auto xs:h:10 sm:h-10 md:h-20 lg:h-20 xl:h-20 w-auto xs:w:10 sm:w-10 md:w-20 lg:w-20 xl:w-20 mx-auto"
 const teamNameClass = "mb-2 xl:text-2xl lg:text-xl md:text-lg sm:text-md xs:text-sm font-bold tracking-tight text-gray-900 dark:text-white"
-export default function CardContent({ isActive, children, phoenixLogo, phoenixTeam, opposingTeam, time, date, location }) {
+export default function CardContent({ isActive, children, phoenixLogo, phoenixTeam, opposingTeam, time, date, location, score }) {
+
+    let phoenixScore;
+    let oppScore;
+    if (score) {
+        // score looks like: "1 - 1"
+        // meaning Phoenix score will be position[0] and opposition will be position[3]
+        phoenixScore = score[0]
+        oppScore = score[4]
+    }
+
     return isActive ? (
         <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
 
@@ -19,9 +29,10 @@ export default function CardContent({ isActive, children, phoenixLogo, phoenixTe
             </div>
 
             <div className="text-center">
-                <p className="font-normal text-gray-700 dark:text-gray-400">time: {time}</p>
-                <p className="font-normal text-gray-700 dark:text-gray-400">date: {date}</p>
-                <p className="font-normal text-gray-700 dark:text-gray-400">location: {location}</p>
+                <p className="text-2xl font-normal text-gray-700 dark:text-white"><b className='text-blue'>{phoenixScore}</b> - {oppScore}</p>
+                <p className="font-normal text-gray-700 dark:text-white">Time: {time}</p>
+                <p className="font-normal text-gray-700 dark:text-white">Date: {date}</p>
+                <p className="font-normal text-gray-700 dark:text-white">Location: {location}</p>
             </div>
             {children}
         </div>
