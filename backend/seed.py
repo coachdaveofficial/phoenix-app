@@ -35,3 +35,52 @@ def seed_players():
         db.session.add(player)
 
     db.session.commit()
+
+def seed_o30():
+            full_names = [
+                        'Brian Peschka',
+                        'Eric Bell',
+                        'Alek Vante',
+                        'Ian Royer',
+                        'Justin Warber',
+                        'Alex McVay',
+                        'Dane Moore',
+                        'Mike Driggs',
+                        'Erin Bricker',
+                        'Matt Gregor',
+                        'Quinn Kuranz',
+                        'Nabil Zerizef',
+                        'Brian Krieger',
+                        'Brian Lowe',
+                        'Jack Carroll',
+                        'Cole Mahaffey',
+                        'Alex Zamora',
+                        'Raul Granados',
+                        'Eric Perez',
+                        'Matt Benes',
+                        'Joe Bennis',
+                        'Sam Masters'
+                    ]
+
+
+            over30_team_id = 11  # Replace with your actual over30_team.id
+
+            # Create the player data list
+            players_data = []
+
+            for full_name in full_names:
+                print(full_name)
+                first_name, last_name = full_name.split(' ')
+                player = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'position': PositionType.midfielder,
+                    'team_id': over30_team_id,
+                }
+                players_data.append(player)
+            
+            for player_data in players_data:
+                player = Player(**player_data)
+                db.session.add(player)
+
+            db.session.commit()
