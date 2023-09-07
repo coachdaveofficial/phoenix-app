@@ -1,4 +1,4 @@
-from sqlalchemy import func, desc, asc
+from sqlalchemy import func, desc, asc, and_, or_
 from models import db, Team, Player, Match, Goal, Assist, Appearance, PositionType, Season, User
 from datetime import date, datetime
 from sqlalchemy.exc import IntegrityError
@@ -64,13 +64,13 @@ class TeamService:
     def update_team_name(team, data):
         '''Accepts Team object and JSON data containing the new team name'''
 
-        # Update the player information based on the data provided
+        # update the player information based on the data provided
         if "name" in data:
             team.name = data["name"]
         else:
             return False, {"message": "Must provide new name. Please try again."}
 
-        # Commit the changes to the database
+        # commit the changes to the database
         try:
             db.session.commit()
             return True, {"message": "Team name updated successfully"}
@@ -453,8 +453,10 @@ class MatchService:
 
         # query for matches with future dates for the specified team
         upcoming_match = Match.query.filter(
-            (Match.home_team_id == team_id or Match.away_team_id == team_id)
-        ).order_by(asc(Match.date)).first()
+            or_(
+                Match.home_team_id == team_id, 
+                Match.away_team_id == team_id
+            )).order_by(asc(Match.date)).first()
 
         if current_date > upcoming_match.date:
             return None
@@ -467,13 +469,16 @@ class MatchService:
 
         # query for matches with past dates for the specified team
         previous_match = Match.query.filter(
-            (Match.home_team_id == team_id or Match.away_team_id == team_id)
-        ).order_by(desc(Match.date)).first()
+        or_(
+            Match.home_team_id == team_id,
+            Match.away_team_id == team_id
+        )).order_by(desc(Match.date)).first()
 
         if current_date < previous_match.date:
             return None
-
+        
         return previous_match
+   
 
 
 class UserService:
