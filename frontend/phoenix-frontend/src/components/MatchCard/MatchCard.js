@@ -22,18 +22,15 @@ export default function MatchCard({phoenixTeam}) {
         const getTeamData = async () => {
             const phoenixTeamResp = await axios.get(`${API_BASE_URL}/teams/?name=${phoenixTeam}`);
             const phoenixTeamObj = phoenixTeamResp.data[0];
-            console.log(phoenixTeamObj)
             const prevMatchResp = await axios.get(`${API_BASE_URL}/matches/${phoenixTeamObj.id}/previous`);
             setPrevData(organizeMatchData(prevMatchResp.data));
 
             try {
                 const upcomingMatchResp = await axios.get(`${API_BASE_URL}/matches/${phoenixTeamObj.id}/upcoming`);
-                console.log(upcomingData)
                 setUpcomingData(organizeMatchData(upcomingMatchResp))
             } catch (e) {
                 setUpcomingData(false)
             }
-
         }
         getTeamData();
     }, [])
@@ -86,17 +83,14 @@ export default function MatchCard({phoenixTeam}) {
                         location={prevData.location}
                         date={prevData.date}
                         time={prevData.time}
+                        
                     /> 
                     :
                     <CardContent 
                         isActive={activeTab === 'Upcoming'} 
                         phoenixLogo={logoUrl} 
                         phoenixTeam={phoenixTeam} 
-                        // opposingTeam={prevData.opposingTeam.name}
-                        // score={`${prevData.score}`} 
-                        location={"no info yet"}
-                        // date={prevData.date}
-                        // time={prevData.time}
+                        opposingTeam={"Unknown"}
                     /> 
                 }
                 {prevData && 
@@ -109,9 +103,12 @@ export default function MatchCard({phoenixTeam}) {
                         location={prevData.location}
                         date={prevData.date}
                         time={prevData.time}
+                        goals={prevData.goals}
                     />
+                
                 }
                 <CardContent isActive={activeTab === 'History'}>
+
                 </CardContent>
             </div>
         </div>
