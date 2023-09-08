@@ -61,6 +61,17 @@ class TeamService:
         }
 
     @staticmethod
+    def create_team(team_name):
+        try:
+            team = Team(name=team_name)
+            db.session.add(team)
+            db.session.commit()
+            return team
+        except IntegrityError:
+            db.session.rollback()
+            return False, {"message": "Team name you provided is currently in use. Please provide a different team name"}
+
+    @staticmethod
     def update_team_name(team, data):
         '''Accepts Team object and JSON data containing the new team name'''
 
@@ -560,32 +571,39 @@ class GoalService:
         # Create lists to store goal scorer and assister data in JSON format
         goal_scorers = []
         assisters = []
+        goals = []
 
         # Iterate through the goals and fetch player data
         for goal, assist in goals_and_assists:
-            if goal:
-                player = goal.players
-                if player:
-                    goal_scorers.append({
-                        "player_id": player.id,
-                        "first_name": player.first_name,
-                        "last_name": player.last_name,
-                        "team_id": player.team_id,
-                        "team_name": player.team.name if player.team else None,
-                    })
+            if not goal: return
 
-            if assist:
-                player = assist.players
-                if player:
-                    assisters.append({
-                        "player_id": player.id,
-                        "first_name": player.first_name,
-                        "last_name": player.last_name,
-                        "team_id": player.team_id,
-                        "team_name": player.team.name if player.team else None,
-                    })
+            player = goal.players
 
-        return {
-            "goal_scorers": goal_scorers,
-            "assisters": assisters,
-        }
+            if not player: return
+
+            goal = {}
+
+            goal['scorer'] = {
+                "player_id": player.id,
+                "first_name": player.first_name,
+                "last_name": player.last_name,
+                "team_id": player.team_id,
+                "team_name": player.team.name if player.team else None,
+            }
+
+            if not assist: return
+
+            player = assist.players
+
+            if not player: return
+
+            goal['assist'] = {
+                "player_id": player.id,
+                "first_name": player.first_name,
+                "last_name": player.last_name,
+                "team_id": player.team_id,
+                "team_name": player.team.name if player.team else None,
+            }
+            goals.append(goal)
+
+        return goals
