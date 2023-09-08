@@ -5,9 +5,9 @@ from services import TeamService, PlayerService
 
 
 def seed_players():
-    open_team = TeamService.create_team("Phoenix FC Open")
+    open_team = TeamService.get_team_by_name("Phoenix FC Open")
     if not open_team:
-          open_team = TeamService.get_team_by_name("Phoenix FC Open")
+         open_team = TeamService.create_team("Phoenix FC Open")
     
     players_data = [
         {'first_name': 'David', 'last_name': 'Falson', 'position': PositionType.midfielder, 'team_id': open_team.id},
@@ -48,9 +48,9 @@ def seed_players():
     db.session.commit()
 
 def seed_o30():
-        over30_team = TeamService.create_team("Phoenix FC O30")
+        over30_team = TeamService.get_team_by_name("Phoenix FC O30")
         if not over30_team:
-            over30_team = TeamService.get_team_by_name("Phoenix FC O30")
+            over30_team = TeamService.create_team("Phoenix FC O30")
         
         full_names = [
                     'Brian Peschka',
@@ -107,15 +107,15 @@ def seed_o30():
         db.session.commit()
 
 def seed_o40():
-        over40_team = TeamService.create_team("Phoenix FC O40")
+        over40_team = TeamService.get_team_by_name("Phoenix FC O40")
         if not over40_team:
-            over40_team = TeamService.get_team_by_name("Phoenix FC O40")
+             over40_team = TeamService.create_team("Phoenix FC O40")            
         
         full_names = [
                     'Mike Khavul',
                     'Jay Henke',
                     'Tim Gerke',
-                    'Vova Panof',
+                    'Vlad Panof',
                     'David Marmor',
                     'Joe Romaker',
                     'Nate Foster',
@@ -132,7 +132,8 @@ def seed_o40():
                     'Gary Ploski',
                     'Vaidas Zievys',
                     'Elon Kaiserman',
-                    'Paul Leslie'
+                    'Paul Leslie',
+                    'Helen Philpot'
                 ]
 
 

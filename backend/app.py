@@ -39,7 +39,7 @@ toolbar = DebugToolbarExtension(app)
 
 app.app_context().push()
 connect_db(app)
-# db.drop_all()
+db.drop_all()
 db.create_all()
 
 @app.before_request
@@ -65,8 +65,10 @@ seed_players()
 seed_o40()
 
 extractor.insert_data([{'worksheet': "Spring 2023 Open", "year": "2023", "season": "Spring", "team_type": "Open"}])
+extractor.insert_data([{'worksheet': "Winter 2023 Open", "year": "2023", "season": "Winter", "team_type": "Open"}])
 extractor.insert_data([{'worksheet': "Spring 2023 O30", "year": "2023", "season": "Spring", "team_type": "O30"}])
 extractor.insert_data([{'worksheet': "Spring 2023 O40", "year": "2023", "season": "Spring", "team_type": "O40"}])
+extractor.insert_data([{'worksheet': "Winter 2023 O40", "year": "2023", "season": "Winter", "team_type": "O40"}])
 
 
 if __name__ == "__main__":
