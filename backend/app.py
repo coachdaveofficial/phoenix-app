@@ -1,6 +1,6 @@
 import os
 
-from seed import seed_players, seed_o30
+from seed import seed_players, seed_o30, seed_o40
 from script import SeasonDataExtractor
 from models import connect_db, db, User
 from flask import Flask, request, jsonify, session, g
@@ -60,12 +60,14 @@ extractor = SeasonDataExtractor("phoenix-fc-sheets-COPY.json", "Copy of Phoenix 
 
 
 
-# seed_o30()
+seed_o30()
+seed_players()
+seed_o40()
 
+extractor.insert_data([{'worksheet': "Spring 2023 Open", "year": "2023", "season": "Spring", "team_type": "Open"}])
+extractor.insert_data([{'worksheet': "Spring 2023 O30", "year": "2023", "season": "Spring", "team_type": "O30"}])
+extractor.insert_data([{'worksheet': "Spring 2023 O40", "year": "2023", "season": "Spring", "team_type": "O40"}])
 
-# extractor.insert_data([{'worksheet': "Spring 2023 Open", "year": "2023", "season": "Spring", "team_type": "Open"}])
-# extractor.insert_data([{'worksheet': "Spring 2023 O30", "year": "2023", "season": "Spring", "team_type": "O30"}])
-# seed_players()
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
