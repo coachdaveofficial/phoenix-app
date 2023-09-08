@@ -8,12 +8,12 @@ export default function Homepage() {
   return (
     <>
       <NavBarFunc />
-      <ScrollSection sectionId={'section-one'} text={"1"} bgColor={"blue"}>
+      <ScrollSection sectionId={'section-one'} bgColor={"blue"}>
         <MatchCard phoenixTeam={"Open"}/>
         <MatchCard phoenixTeam={"O30"}/>
-        <MatchCard phoenixTeam={"o40"}/>
+        <MatchCard phoenixTeam={"O40"}/>
       </ScrollSection>
-      <ScrollSection sectionId={'section-two'} text={"2"} bgColor={"orange"} />
+      <ScrollSection sectionId={'section-two'} bgColor={"orange"} />
     </>
   )
 }
