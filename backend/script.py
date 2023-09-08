@@ -130,7 +130,7 @@ class SeasonDataExtractor:
                 time_str = game['time']
                 match_datetime = datetime.strptime(date_str + ' ' + time_str, '%a %b %d %Y %I:%M %p')
 
-                
+                            
                 # Create or get home and away teams
                 home_team_name = game['home']
                 away_team_name = game['away']
@@ -153,6 +153,20 @@ class SeasonDataExtractor:
 
                 db.session.commit()
 
+                phoenix_id = home_team.id if home_team_name.startswith("Phoenix") else away_team.id
+
+                 # Check if the match already exists in the database by matching the date, venue, and team IDs
+                existing_match = Match.query.filter(
+                    Match.date == match_datetime,
+                    Match.venue == game['location'],
+                    Match.home_team_id == home_team.id,
+                    Match.away_team_id == away_team.id
+                ).first()
+
+                if existing_match:
+                    print(f"Match already exists: {existing_match.id}")
+                    continue
+
                 
                 season = Season.query.filter_by(name=f'{season_name} {year}').first()
                 if not season:
@@ -162,7 +176,6 @@ class SeasonDataExtractor:
                 
                 # Create a match
                 match = Match(
-                    # id=int(game['game_id']),
                     date=match_datetime,
                     venue=game['location'],
                     season_id=season.id,
@@ -185,7 +198,8 @@ class SeasonDataExtractor:
                     # Get or create goal scorer
                     goal_scorer = Player.query.filter_by(first_name=goal_scorer_name).first() or Player.query.filter_by(last_name=goal_scorer_name).first()
                     if not goal_scorer:
-                        goal_scorer = Player(first_name=goal_scorer_name, last_name='', position=PositionType.forward, team_id=1)
+
+                        goal_scorer = Player(first_name=goal_scorer_name, last_name='', position=PositionType.forward, team_id=phoenix_id)
                         db.session.add(goal_scorer)
                         db.session.commit()
 
@@ -193,7 +207,7 @@ class SeasonDataExtractor:
                     assisted_by = Player.query.filter_by(first_name=assisted_by_name).first() or Player.query.filter_by(last_name=assisted_by_name).first()
                     if not assisted_by:
                         if assisted_by_name:
-                            assisted_by = Player(first_name=assisted_by_name, last_name='', position=PositionType.forward, team_id=1)
+                            assisted_by = Player(first_name=assisted_by_name, last_name='', position=PositionType.forward, team_id=phoenix_id)
                             db.session.add(assisted_by)
                             db.session.commit()
 
