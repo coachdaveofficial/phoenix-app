@@ -8,6 +8,8 @@ export default function organizeMatchData(data) {
   
     // Access location and score
     const location = data.venue;
+    const goals = data.goals;
+
     let score;
     let opposingTeam;
     // Ensure the Phoenix score comes first when displaying score
@@ -26,7 +28,8 @@ export default function organizeMatchData(data) {
       date: matchDateString,
       location,
       score,
-      opposingTeam
+      opposingTeam,
+      goals
     };
   
     return organizedData;
