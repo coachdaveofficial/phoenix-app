@@ -2,6 +2,7 @@ import gspread
 import re
 from datetime import datetime
 from models import db, Player, Team, Match, Goal, Assist, PositionType, Season
+from sqlalchemy import func
 
 class SeasonDataExtractor:
     def __init__(self, service_account_file, sheet_name):
@@ -170,10 +171,12 @@ class SeasonDataExtractor:
                 
                 season = Season.query.filter_by(name=f'{season_name} {year}').first()
                 if not season:
-                    season = Season(name=f'{season_name} {year}')
+                    season = Season(name=f'{season_name} {year}', start_date=match_datetime)
                     db.session.add(season)
-                db.session.commit()    
-                
+                db.session.commit()  
+                if season.start_date < match_datetime:  
+                    season.end_date = match_datetime
+                    db.session.commit()
                 # Create a match
                 match = Match(
                     date=match_datetime,
@@ -195,16 +198,32 @@ class SeasonDataExtractor:
                     print('assist', assisted_by_name)
                     print('match', match.id)
 
-                    # Get or create goal scorer
-                    goal_scorer = Player.query.filter_by(first_name=goal_scorer_name).first() or Player.query.filter_by(last_name=goal_scorer_name).first()
+                    # Convert both the goal_scorer_name and the column values to lowercase for case-insensitive matching
+                    goal_scorer_name_lower = goal_scorer_name.lower()
+
+                    goal_scorer = (
+                        Player.query
+                        .filter(func.lower(Player.first_name).ilike(goal_scorer_name_lower) |
+                                func.lower(Player.last_name).ilike(goal_scorer_name_lower))
+                        .filter(Player.team_id == phoenix_id)
+                        .first()
+                    )
                     if not goal_scorer:
 
                         goal_scorer = Player(first_name=goal_scorer_name, last_name='', position=PositionType.forward, team_id=phoenix_id)
                         db.session.add(goal_scorer)
                         db.session.commit()
 
-                    # Get or create player who assisted the goal
-                    assisted_by = Player.query.filter_by(first_name=assisted_by_name).first() or Player.query.filter_by(last_name=assisted_by_name).first()
+                    # Convert both the assisted_by_name and the column values to lowercase for case-insensitive matching
+                    assisted_by_name_lower = assisted_by_name.lower()
+
+                    assisted_by = (
+                        Player.query
+                        .filter(func.lower(Player.first_name).ilike(assisted_by_name_lower) |
+                                func.lower(Player.last_name).ilike(assisted_by_name_lower))
+                        .filter(Player.team_id == phoenix_id)
+                        .first()
+                    )
                     if not assisted_by:
                         if assisted_by_name:
                             assisted_by = Player(first_name=assisted_by_name, last_name='', position=PositionType.forward, team_id=phoenix_id)
