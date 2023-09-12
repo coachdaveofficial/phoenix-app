@@ -17,3 +17,11 @@ def get_previous_match(team_id):
     if not previous:
         return jsonify({"message": "No previous matches for this team"}), 404
     return make_response(MatchService.jsonify_match(previous), 200)
+
+@matches_bp.route('/matches/<int:team_id>/previous/all', methods=["GET"])
+def get_previous_match_list(team_id):
+    previous_matches = MatchService.get_all_previous_matches_by_team_id(team_id)
+    if not previous_matches:
+        return jsonify({"message": "No previous matches for this team"}), 404
+    match_list = [MatchService.jsonify_match(match) for match in previous_matches]
+    return make_response(match_list, 200)
