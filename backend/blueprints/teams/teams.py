@@ -8,12 +8,11 @@ teams_bp = Blueprint("teams", __name__)
 @teams_bp.route("/teams/", methods=["GET"])
 def teams():
     name = request.args.get("name")
-    teams_list = None
 
     if name:
-        teams_list = TeamService.get_all_teams(name)
+        teams_list = TeamService.get_teams(name)
     else:
-        teams_list = TeamService.get_all_teams()
+        teams_list = TeamService.get_teams()
 
     if not teams_list:
         return make_response(jsonify({"message": "Team(s) not found."}), 404)

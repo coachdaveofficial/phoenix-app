@@ -1,6 +1,6 @@
 from functools import wraps
 from flask import Blueprint, jsonify, make_response, request, redirect, flash, g
-from services import PlayerService
+from services import PlayerService, TeamService, SeasonService
 from models import PositionType
 from blueprints.auth.auth import login_required
 
@@ -92,7 +92,25 @@ def update_or_delete_player(id):
 
 @players_bp.route("/players/mostgoals/", methods=["GET"])
 def get_top_goalscorer():
-    top_scorers = PlayerService.get_player_with_most_goals()
+    team_name = request.args.get('team_name')
+    recent = request.args.get('recent')
+    recent_season = None
+
+    if recent:
+        recent_season = SeasonService.get_most_recent_season()
+    
+    if team_name:
+        team = TeamService.get_teams(team_name=team_name)
+        team_id = team[0]['id'] if team else None
+    else:
+        team_id = None
+
+    if recent_season:
+        top_scorers = PlayerService.get_top_goal_scorers_by_season(recent_season.id, team_id)
+        return make_response(jsonify(top_scorers))
+    else:
+        top_scorers = PlayerService.get_player_with_most_goals(team_id=team_id)
+    
     json_players = []
     # if multiple players with same amount of goals, return them all
     if type(top_scorers) is list:
@@ -106,12 +124,30 @@ def get_top_goalscorer():
 
 @players_bp.route("/players/mostassists/", methods=["GET"])
 def get_most_assists():
-    most_assists = PlayerService.get_player_with_most_assists()
+    team_name = request.args.get('team_name')
+    recent = request.args.get('recent')
+    recent_season = None
+
+    if recent:
+        recent_season = SeasonService.get_most_recent_season()
+    
+    if team_name:
+        team = TeamService.get_teams(team_name=team_name)
+        team_id = team[0]['id'] if team else None
+    else:
+        team_id = None
+
+    if recent_season:
+        most_assists = PlayerService.get_most_assists_by_season(recent_season.id, team_id)
+        return make_response(jsonify(most_assists))
+    else:
+        most_assists = PlayerService.get_player_with_most_assists(team_id=team_id)
+    
     json_players = []
-    # if multiple players with same amount of assists, return them all
+    # if multiple players with same amount of goals, return them all
     if type(most_assists) is list:
-        for player in most_assists:
-            json_players.append(PlayerService.jsonify_player(player))
+        for assister in most_assists:
+            json_players.append(PlayerService.jsonify_player(assister))
 
         return make_response(jsonify(json_players), 200)
 
@@ -120,8 +156,12 @@ def get_most_assists():
 
 @players_bp.route("/players/mostapps/", methods=["GET"])
 def get_most_apps():
-
-    most_apps = PlayerService.get_player_with_most_appearances()
+    team_name = request.args.get('team_name') or ''
+    team = TeamService.get_team_by_name(team_name)
+    if team is not None:
+        most_apps = PlayerService.get_player_with_most_appearances(team.id)
+    else:
+        most_apps = PlayerService.get_player_with_most_appearances()
     json_players = []
     # if multiple players with same amount of appearances, return them all
     if type(most_apps) is list:
