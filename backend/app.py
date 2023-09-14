@@ -11,6 +11,7 @@ from flask_cors import CORS, cross_origin
 from blueprints.players.players import players_bp
 from blueprints.teams.teams import teams_bp
 from blueprints.matches.matches import matches_bp
+from blueprints.seasons.seasons import seasons_bp
 from blueprints.auth.auth import auth_bp, CURR_USER_KEY
 
 app = Flask(__name__)
@@ -18,6 +19,7 @@ CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 app.register_blueprint(players_bp, url_prefix='/api')
 app.register_blueprint(teams_bp, url_prefix='/api')
 app.register_blueprint(matches_bp, url_prefix='/api')
+app.register_blueprint(seasons_bp, url_prefix='/api')
 app.register_blueprint(auth_bp, url_prefix='/')
 
 
@@ -39,7 +41,7 @@ toolbar = DebugToolbarExtension(app)
 
 app.app_context().push()
 connect_db(app)
-db.drop_all()
+# db.drop_all()
 db.create_all()
 
 @app.before_request
@@ -69,6 +71,9 @@ extractor.insert_data([{'worksheet': "Winter 2023 Open", "year": "2023", "season
 extractor.insert_data([{'worksheet': "Spring 2023 O30", "year": "2023", "season": "Spring", "team_type": "O30"}])
 extractor.insert_data([{'worksheet': "Spring 2023 O40", "year": "2023", "season": "Spring", "team_type": "O40"}])
 extractor.insert_data([{'worksheet': "Winter 2023 O40", "year": "2023", "season": "Winter", "team_type": "O40"}])
+extractor.insert_data([{'worksheet': "Fall 2022 O40", "year": "2022", "season": "Fall", "team_type": "O40"}])
+extractor.insert_data([{'worksheet': "Spring 2022 O40", "year": "2022", "season": "Spring", "team_type": "O40"}])
+extractor.insert_data([{'worksheet': "Winter 2022 O40", "year": "2022", "season": "Winter", "team_type": "O40"}])
 
 
 if __name__ == "__main__":
