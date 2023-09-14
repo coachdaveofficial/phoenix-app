@@ -9,9 +9,8 @@ bcrypt = Bcrypt()
 
 class TeamService:
     @staticmethod
-    def get_all_teams(team_name=None):
+    def get_teams(team_name=None):
         # Get all teams or filter by name if provided
-
         team_name_mapping = {
             "open": "Phoenix FC Open",
             "o30": "Phoenix FC O30",
@@ -19,7 +18,7 @@ class TeamService:
             "over 30": "Phoenix FC O30",
             "over 40": "Phoenix FC O40",
         }
-
+        
         # Check if the provided team_name matches any variation in the mapping
         if team_name and team_name.lower() in team_name_mapping:
             team_name = team_name_mapping[team_name.lower()]
@@ -242,69 +241,136 @@ class PlayerService:
                 Team.name.ilike(f'%{team}%'))
 
         return query.all()
-
+    
     @staticmethod
-    def get_player_with_most_goals():
+    def get_player_with_most_goals(team_id=None):
+        # filter by team_id if provided, else get most goals regardless of team
+        if team_id is not None:
+            query = (
+                Player.query
+                .join(Goal, Goal.player_id == Player.id)
+                .group_by(Player.id)
+                .with_entities(Player.id, func.count(Goal.id).label('goals_count'))
+                .order_by(desc(func.count(Goal.id)))
+                .filter(Player.team_id == team_id)
+            )
 
-        most_goals_count = (
-            Player.query
-            .join(Goal)
-            .group_by(Player.id)
-            .with_entities(Player.id, func.count(Goal.id).label('goals_count'))
-            .order_by(desc(func.count(Goal.id)))
-            .first()
-            .goals_count
-        )
+            most_goals_count = query.first().goals_count
 
-        players_with_most_goals = (
-            Player.query
-            .join(Goal)
-            .group_by(Player.id)
-            .having(func.count(Goal.id) == most_goals_count)
-            .all()
-        )
+            players_with_most_goals = (
+                Player.query
+                .join(Goal, Goal.player_id == Player.id)
+                .group_by(Player.id)
+                .having(func.count(Goal.id) == most_goals_count)
+                .filter(Player.team_id == team_id)
+                .all()
+            )
+        else:
+            query = (
+                Player.query
+                .join(Goal, Goal.player_id == Player.id)
+                .group_by(Player.id)
+                .with_entities(Player.id, func.count(Goal.id).label('goals_count'))
+                .order_by(desc(func.count(Goal.id)))
+            )
+
+            most_goals_count = query.first().goals_count
+
+            players_with_most_goals = (
+                Player.query
+                .join(Goal, Goal.player_id == Player.id)
+                .group_by(Player.id)
+                .having(func.count(Goal.id) == most_goals_count)
+                .all()
+            )
+
         return players_with_most_goals
 
     @staticmethod
-    def get_player_with_most_assists():
-        most_assists_count = (
-            Player.query
-            .join(Assist)
-            .group_by(Player.id)
-            .with_entities(Player.id, func.count(Assist.id).label('assists_count'))
-            .order_by(desc(func.count(Assist.id)))
-            .first()
-            .assists_count
-        )
+    def get_player_with_most_assists(team_id=None):
+        # filter by team_id if provided, else get most assists regardless of team
+        if team_id is not None:
+            query = (
+                Player.query
+                .join(Assist)
+                .group_by(Player.id)
+                .with_entities(Player.id, func.count(Assist.id).label('assists_count'))
+                .order_by(desc(func.count(Assist.id)))
+                .filter(Player.team_id == team_id)
+            )
+        
+            most_assists_count = query.first().assists_count
 
-        players_with_most_assists = (
-            Player.query
-            .join(Assist)
-            .group_by(Player.id)
-            .having(func.count(Assist.id) == most_assists_count)
-            .all()
-        )
+            players_with_most_assists = (
+                Player.query
+                .join(Assist)
+                .group_by(Player.id)
+                .having(func.count(Assist.id) == most_assists_count)
+                .filter(Player.team_id == team_id)
+                .all()
+            )
+        else:
+            query = (
+                Player.query
+                .join(Assist)
+                .group_by(Player.id)
+                .with_entities(Player.id, func.count(Assist.id).label('assists_count'))
+                .order_by(desc(func.count(Assist.id)))
+            )
+        
+            most_assists_count = query.first().assists_count
+
+            players_with_most_assists = (
+                Player.query
+                .join(Assist)
+                .group_by(Player.id)
+                .having(func.count(Assist.id) == most_assists_count)
+                .all()
+            )
+
         return players_with_most_assists
 
     @staticmethod
-    def get_player_with_most_appearances():
-        most_appearances_count = (
-            Player.query
-            .join(Appearance)
-            .group_by(Player.id)
-            .with_entities(Player.id, func.count(Appearance.id).label('appearances_count'))
-            .order_by(desc(func.count(Appearance.id)))
-            .first()
-            .appearances_count
-        )
+    def get_player_with_most_appearances(team_id=None):
+        # filter by team_id if provided, else get most appearances regardless of team
+        if team_id is not None:
+            most_appearances_count = (
+                Player.query
+                .join(Appearance)
+                .group_by(Player.id)
+                .with_entities(Player.id, func.count(Appearance.id).label('appearances_count'))
+                .order_by(desc(func.count(Appearance.id)))
+                .filter(Player.team_id == team_id)
+                .first()
+                .appearances_count
+            )
 
-        players_with_most_appearances = (
-            Player.query
-            .join(Appearance)
-            .group_by(Player.id)
-            .having(func.count(Appearance.id) == most_appearances_count)
-            .all()
-        )
+            players_with_most_appearances = (
+                Player.query
+                .join(Appearance)
+                .group_by(Player.id)
+                .having(func.count(Appearance.id) == most_appearances_count)
+                .filter(Player.team_id == team_id)
+                .all()
+            )
+        else:
+            most_appearances_count = (
+                Player.query
+                .join(Appearance)
+                .group_by(Player.id)
+                .with_entities(Player.id, func.count(Appearance.id).label('appearances_count'))
+                .order_by(desc(func.count(Appearance.id)))
+                .first()
+                .appearances_count
+            )
+
+            players_with_most_appearances = (
+                Player.query
+                .join(Appearance)
+                .group_by(Player.id)
+                .having(func.count(Appearance.id) == most_appearances_count)
+                .all()
+            )
         return players_with_most_appearances
 
     @staticmethod
@@ -335,6 +401,118 @@ class PlayerService:
         }
 
         return player_stats
+
+    @staticmethod
+    def get_top_goal_scorers_by_season(season_id, team_id=None):
+        # Get the season and matches in the season
+        season = SeasonService.get_season_by_id(season_id)
+        if not season:
+            return None
+
+        matches_in_season = MatchService.get_matches_by_season_id(season_id)
+
+        # Build the base query
+        query = (
+            db.session.query(
+                Player,
+                Team,
+                func.count(Goal.id).label('goals')
+            )
+            .join(Goal, Goal.player_id == Player.id)
+            .join(Player.team)
+            .filter(Goal.match_id.in_([match.id for match in matches_in_season]))
+            .group_by(Player.id, Team.id)
+            .order_by(desc('goals'))
+        )
+
+        # Apply team_id filter if provided
+        if team_id is not None:
+            query = query.filter(Player.team_id == team_id)
+
+        # Execute the query and fetch the results
+        top_scorers_query = query.all()
+
+        if not top_scorers_query:
+            return None
+
+        # Find the maximum goals scored
+        max_goals = top_scorers_query[0][2]  # Get the goals of the first player
+
+        top_scorers = []
+
+        for player, team, goals in top_scorers_query:
+            player_name = f"{player.first_name} {player.last_name}"
+
+            if goals < max_goals:
+                break  # No more players with the same number of goals
+
+            top_scorer_stats = {
+                "player_name": player_name,
+                "season_name": season.name,
+                "team_name": team.name,
+                "goals": goals,
+            }
+
+            top_scorers.append(top_scorer_stats)
+
+        return top_scorers
+    
+    @staticmethod
+    def get_most_assists_by_season(season_id, team_id=None):
+        # Get the season and matches in the season
+        season = SeasonService.get_season_by_id(season_id)
+        if not season:
+            return None
+
+        matches_in_season = MatchService.get_matches_by_season_id(season_id)
+
+        # Build the base query
+        query = (
+            db.session.query(
+                Player,
+                Team,
+                func.count(Assist.id).label('assists_count')
+            )
+            .join(Assist, Assist.player_id == Player.id)
+            .join(Player.team)
+            .filter(Assist.match_id.in_([match.id for match in matches_in_season]))
+            .group_by(Player.id, Team.id)
+            .order_by(desc('assists_count'))
+        )
+        
+        # Apply team_id filter if provided
+        if team_id is not None:
+            query = query.filter(Player.team_id == team_id)
+
+        # Execute the query and fetch the results
+        most_assists_query = query.all()
+
+        if not most_assists_query:
+            return None
+
+        # Find the maximum goals scored
+        max_assists = most_assists_query[0][2]  # Get the goals of the first player
+
+        most_assists = []
+
+        for player, team, assists in most_assists_query:
+            player_name = f"{player.first_name} {player.last_name}"
+
+            if assists < max_assists:
+                break  # No more players with the same number of goals
+
+            most_assists_stats = {
+                "player_name": player_name,
+                "season_name": season.name,
+                "team_name": team.name,
+                "assists": assists,
+            }
+
+            most_assists.append(most_assists_stats)
+
+        return most_assists
+
+
 
     @staticmethod
     def add_goal_for_player(player_id, match_id, assisted_by_id):
@@ -484,13 +662,31 @@ class MatchService:
             Match.home_team_id == team_id,
             Match.away_team_id == team_id
         )).order_by(desc(Match.date)).first()
-
+        if not previous_match:
+            return None
         if current_date < previous_match.date:
             return None
         
         return previous_match
    
+    @staticmethod
+    def get_all_previous_matches_by_team_id(team_id):
+        current_date = datetime.now()
+        previous_matches = []
+        # query for matches with past dates for the specified team
+        previous_match_results = Match.query.filter(
+        or_(
+            Match.home_team_id == team_id,
+            Match.away_team_id == team_id
+        )).order_by(desc(Match.date)).all()
 
+        for match in previous_match_results:
+            # skip all future match dates
+            if current_date < match.date:
+                continue
+            previous_matches.append(match)
+
+        return previous_matches
 
 class UserService:
     """Services for getting user info"""
@@ -555,6 +751,17 @@ class SeasonService:
 
         if not season:
             return None
+        return season
+    
+    @staticmethod
+    def get_season_by_name(season_name):
+        season = Season.query.filter(func.lower(Season.name).ilike(
+            f'%{season_name.lower()}%')).first()
+        return season
+    
+    @staticmethod
+    def get_most_recent_season():
+        season = Season.query.order_by(desc(Season.end_date)).first()
         return season
 
 class GoalService:
