@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Tab from './Tab';
-import CardContent from './CardContent';
+import MatchCardContent from './MatchCardContent';
+import PlayerStatsCardContent from './PlayerStatsCardContent';
 import organizeMatchData from '@/helpers/organizeMatchData';
 
 
@@ -13,6 +14,8 @@ export default function MatchCard({phoenixTeam}) {
     const [activeTab, setActiveTab] = useState('Upcoming');
     const [prevData, setPrevData] = useState(null);
     const [upcomingData, setUpcomingData] = useState(null);
+    const [mostGoalsAndAssistsData, setMostGoalsAndAssistsData] = useState({});
+    const [recentSeasonRecords, setRecentSeasonsRecords] = useState({})
 
     const handleTabClick = (tab) => {
         setActiveTab(tab);
@@ -23,13 +26,19 @@ export default function MatchCard({phoenixTeam}) {
             const phoenixTeamResp = await axios.get(`${API_BASE_URL}/teams/?name=${phoenixTeam}`);
             const phoenixTeamObj = phoenixTeamResp.data[0];
             const prevMatchResp = await axios.get(`${API_BASE_URL}/matches/${phoenixTeamObj.id}/previous`);
+            const mostGoalsResp = await axios.get(`${API_BASE_URL}/players/mostgoals/?team_name=${phoenixTeamObj.name}`);
+            const mostAssistsResp = await axios.get(`${API_BASE_URL}/players/mostassists/?team_name=${phoenixTeamObj.name}`);
+            const recentSeasonGoalsResp = await axios.get(`${API_BASE_URL}/players/mostgoals/?team_name=${phoenixTeamObj.name}&recent=True`);
+            const recentSeasonAssistsResp = await axios.get(`${API_BASE_URL}/players/mostassists/?team_name=${phoenixTeamObj.name}&recent=True`);
             setPrevData(organizeMatchData(prevMatchResp.data));
+            setMostGoalsAndAssistsData({mostGoals: mostGoalsResp.data, mostAssists: mostAssistsResp.data});
+            setRecentSeasonsRecords({mostGoals: recentSeasonGoalsResp.data, mostAssists: recentSeasonAssistsResp.data})
 
             try {
                 const upcomingMatchResp = await axios.get(`${API_BASE_URL}/matches/${phoenixTeamObj.id}/upcoming`);
-                setUpcomingData(organizeMatchData(upcomingMatchResp))
+                setUpcomingData(organizeMatchData(upcomingMatchResp));
             } catch (e) {
-                setUpcomingData(false)
+                setUpcomingData(false);
             }
         }
         getTeamData();
@@ -44,7 +53,7 @@ export default function MatchCard({phoenixTeam}) {
                 <select value={activeTab} onChange={e => setActiveTab(e.target.value)} id="tabs" className="bg-gray-50 border-0 border-b border-gray-200 text-gray-900 text-xs rounded-t-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 break-words">
                     <option>Upcoming</option>
                     <option>Previous</option>
-                    <option>History</option>
+                    <option>Player Stats</option>
                 </select>
             </div>
             <div className="hidden lg:block">
@@ -65,16 +74,16 @@ export default function MatchCard({phoenixTeam}) {
                     </li>
                     <li className="w-full">
                         <Tab
-                            label="History"
-                            isActive={activeTab === 'History'}
-                            onClick={() => handleTabClick('History')}
+                            label="Player Stats"
+                            isActive={activeTab === 'Player Stats'}
+                            onClick={() => handleTabClick('Player Stats')}
                         />
                     </li>
                 </ul>
             </div>
             <div className="">
             {upcomingData ? 
-                    <CardContent 
+                    <MatchCardContent 
                         isActive={activeTab === 'Upcoming'} 
                         phoenixLogo={logoUrl} 
                         phoenixTeam={phoenixTeam} 
@@ -86,7 +95,7 @@ export default function MatchCard({phoenixTeam}) {
                         
                     /> 
                     :
-                    <CardContent 
+                    <MatchCardContent 
                         isActive={activeTab === 'Upcoming'} 
                         phoenixLogo={logoUrl} 
                         phoenixTeam={phoenixTeam} 
@@ -94,7 +103,7 @@ export default function MatchCard({phoenixTeam}) {
                     /> 
                 }
                 {prevData && 
-                    <CardContent 
+                    <MatchCardContent 
                         isActive={activeTab === 'Previous'} 
                         phoenixLogo={logoUrl} 
                         phoenixTeam={phoenixTeam} 
@@ -107,9 +116,18 @@ export default function MatchCard({phoenixTeam}) {
                     />
                 
                 }
-                <CardContent isActive={activeTab === 'History'}>
+                {mostGoalsAndAssistsData && 
+                    <PlayerStatsCardContent 
+                        isActive={activeTab === 'Player Stats'} 
+                        allTimeGoalScorers={mostGoalsAndAssistsData.mostGoals}
+                        allTimeAssisters={mostGoalsAndAssistsData.mostAssists}
+                        recentSeasonTopScorers={recentSeasonRecords.mostGoals}
+                        recentSeasonMostAssists={recentSeasonRecords.mostAssists}
+                    
+                    />
 
-                </CardContent>
+
+                }
             </div>
         </div>
     );

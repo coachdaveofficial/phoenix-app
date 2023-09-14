@@ -4,7 +4,7 @@ const defaultLogo = "https://static.vecteezy.com/system/resources/thumbnails/005
 const imgClass = "rounded-full w-auto h-auto xs:h:10 sm:h-10 md:h-20 lg:h-20 xl:h-20 w-auto xs:w:10 sm:w-10 md:w-20 lg:w-20 xl:w-20 mx-auto"
 const teamNameClass = "mb-2 xl:text-2xl lg:text-xl md:text-lg sm:text-md xs:text-sm font-bold tracking-tight text-gray-900 dark:text-white"
 const goalClass = "xl:text-sm sm:text-xs xs:text-xs text-center transition-scale duration-300 hover:scale-105 border p-2 m-2 rounded-md shadow-md"
-export default function CardContent({ isActive, children, phoenixLogo, phoenixTeam, opposingTeam, time, date, location, score, goals }) {
+export default function MatchCardContent({ isActive, children, phoenixLogo, phoenixTeam, opposingTeam, time, date, location, score, goals }) {
     let phoenixScore;
     let oppScore;
     if (score) {
