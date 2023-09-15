@@ -3,6 +3,7 @@ import Tab from './Tab';
 import MatchCardContent from './MatchCardContent';
 import PlayerStatsCardContent from './PlayerStatsCardContent';
 import organizeMatchData from '@/helpers/organizeMatchData';
+import { PropagateLoader } from 'react-spinners';
 
 
 const logoUrl = '/phoenixfc_logo.jpeg'
@@ -10,12 +11,13 @@ const logoUrl = '/phoenixfc_logo.jpeg'
 import axios from "axios";
 const API_BASE_URL = 'http://127.0.0.1:8080/api';
 
-export default function MatchCard({phoenixTeam}) {
+export default function MatchCard({ phoenixTeam }) {
     const [activeTab, setActiveTab] = useState('Upcoming');
     const [prevData, setPrevData] = useState(null);
     const [upcomingData, setUpcomingData] = useState(null);
     const [mostGoalsAndAssistsData, setMostGoalsAndAssistsData] = useState({});
-    const [recentSeasonRecords, setRecentSeasonsRecords] = useState({})
+    const [recentSeasonRecords, setRecentSeasonsRecords] = useState({});
+    const [loading, setLoading] = useState(true);
 
     const handleTabClick = (tab) => {
         setActiveTab(tab);
@@ -31,8 +33,8 @@ export default function MatchCard({phoenixTeam}) {
             const recentSeasonGoalsResp = await axios.get(`${API_BASE_URL}/players/mostgoals/?team_name=${phoenixTeamObj.name}&recent=True`);
             const recentSeasonAssistsResp = await axios.get(`${API_BASE_URL}/players/mostassists/?team_name=${phoenixTeamObj.name}&recent=True`);
             setPrevData(organizeMatchData(prevMatchResp.data));
-            setMostGoalsAndAssistsData({mostGoals: mostGoalsResp.data, mostAssists: mostAssistsResp.data});
-            setRecentSeasonsRecords({mostGoals: recentSeasonGoalsResp.data, mostAssists: recentSeasonAssistsResp.data})
+            setMostGoalsAndAssistsData({ mostGoals: mostGoalsResp.data, mostAssists: mostAssistsResp.data });
+            setRecentSeasonsRecords({ mostGoals: recentSeasonGoalsResp.data, mostAssists: recentSeasonAssistsResp.data })
 
             try {
                 const upcomingMatchResp = await axios.get(`${API_BASE_URL}/matches/${phoenixTeamObj.id}/upcoming`);
@@ -40,6 +42,7 @@ export default function MatchCard({phoenixTeam}) {
             } catch (e) {
                 setUpcomingData(false);
             }
+            setLoading(false)
         }
         getTeamData();
     }, [])
@@ -81,49 +84,61 @@ export default function MatchCard({phoenixTeam}) {
                     </li>
                 </ul>
             </div>
+            {/* Card Content below */}
             <div className="">
-            {upcomingData ? 
-                    <MatchCardContent 
-                        isActive={activeTab === 'Upcoming'} 
-                        phoenixLogo={logoUrl} 
-                        phoenixTeam={phoenixTeam} 
+                {upcomingData ?
+                    <MatchCardContent
+                        isActive={activeTab === 'Upcoming'}
+                        phoenixLogo={logoUrl}
+                        phoenixTeam={phoenixTeam}
                         opposingTeam={prevData.opposingTeam.name}
-                        score={`${prevData.score}`} 
+                        score={`${prevData.score}`}
                         location={prevData.location}
                         date={prevData.date}
                         time={prevData.time}
-                        
-                    /> 
+
+                    />
                     :
-                    <MatchCardContent 
-                        isActive={activeTab === 'Upcoming'} 
-                        phoenixLogo={logoUrl} 
-                        phoenixTeam={phoenixTeam} 
+                    <MatchCardContent
+                        isActive={activeTab === 'Upcoming'}
+                        loading={loading}
+                        phoenixLogo={logoUrl}
+                        phoenixTeam={phoenixTeam}
                         opposingTeam={"Unknown"}
-                    /> 
+                    />
                 }
-                {prevData && 
-                    <MatchCardContent 
-                        isActive={activeTab === 'Previous'} 
-                        phoenixLogo={logoUrl} 
-                        phoenixTeam={phoenixTeam} 
+                {prevData ?
+                    <MatchCardContent
+                        isActive={activeTab === 'Previous'}
+                        loading={loading}
+                        phoenixLogo={logoUrl}
+                        phoenixTeam={phoenixTeam}
                         opposingTeam={prevData.opposingTeam.name}
-                        score={`${prevData.score}`} 
+                        score={`${prevData.score}`}
                         location={prevData.location}
                         date={prevData.date}
                         time={prevData.time}
                         goals={prevData.goals}
+                        loadIcon={PropagateLoader}
                     />
-                
+                    :
+                    <MatchCardContent
+                        isActive={activeTab === 'Previous'}
+                        loading={loading}
+                        phoenixLogo={logoUrl}
+
+                    />
+
                 }
-                {mostGoalsAndAssistsData && 
-                    <PlayerStatsCardContent 
-                        isActive={activeTab === 'Player Stats'} 
+                {mostGoalsAndAssistsData &&
+                    <PlayerStatsCardContent
+                        isActive={activeTab === 'Player Stats'}
+                        loading={loading}
                         allTimeGoalScorers={mostGoalsAndAssistsData.mostGoals}
                         allTimeAssisters={mostGoalsAndAssistsData.mostAssists}
                         recentSeasonTopScorers={recentSeasonRecords.mostGoals}
                         recentSeasonMostAssists={recentSeasonRecords.mostAssists}
-                    
+
                     />
 
 
