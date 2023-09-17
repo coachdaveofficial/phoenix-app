@@ -107,7 +107,7 @@ def get_top_goalscorer():
 
     if recent_season:
         top_scorers = PlayerService.get_top_goal_scorers_by_season(recent_season.id, team_id)
-        return make_response(jsonify(top_scorers))
+        return make_response(jsonify({"data":(top_scorers), "season": SeasonService.jsonify_season(recent_season)}))
     else:
         top_scorers = PlayerService.get_player_with_most_goals(team_id=team_id)
     
@@ -139,9 +139,10 @@ def get_most_assists():
 
     if recent_season:
         most_assists = PlayerService.get_most_assists_by_season(recent_season.id, team_id)
-        return make_response(jsonify(most_assists))
+        return make_response(jsonify({"data":(most_assists), "season": SeasonService.jsonify_season(recent_season)}))
     else:
         most_assists = PlayerService.get_player_with_most_assists(team_id=team_id)
+
     
     json_players = []
     # if multiple players with same amount of goals, return them all
