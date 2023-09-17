@@ -1,11 +1,24 @@
 export default function organizeMatchData(data) {
-        // Parse the date string into a Date object
+    // Parse the date string into a Date object
     const matchDate = new Date(data.date);
-  
+    console.log(`${data.home_team.name} vs ${data.away_team.name} `, matchDate)
+
+
+    // Format the date string without converting the time zone to local time
+    const options = {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'UTC'
+    };
+
+    // { hour: '2-digit', minute: '2-digit', hour12: true }
+
+
+
     // Extract time and date components
-    const matchTime = matchDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    const matchTime = matchDate.toLocaleTimeString([], options);
     const matchDateString = matchDate.toDateString();
-  
+
     // Access location and score
     const location = data.venue;
     const goals = data.goals;
@@ -14,23 +27,30 @@ export default function organizeMatchData(data) {
     let opposingTeam;
     // Ensure the Phoenix score comes first when displaying score
     if (data.home_team.name.startsWith("Phoenix")) {
-        score = `${data.score.home} - ${data.score.away}`;
+        // score may not be present if is a future match
+        if (data.score) {
+            score = `${data.score.home} - ${data.score.away}`;
+        }
+
         opposingTeam = data.away_team;
     } else {
-        score = `${data.score.away} - ${data.score.home}`;
+        //  score may not be present if is a future match
+        if (data.score) {
+            score = `${data.score.away} - ${data.score.home}`;
+        }
+
         opposingTeam = data.home_team;
     }
-    
-  
+
     // Organized data
     const organizedData = {
-      time: matchTime,
-      date: matchDateString,
-      location,
-      score,
-      opposingTeam,
-      goals
+        time: matchTime,
+        date: matchDateString,
+        location,
+        score,
+        opposingTeam,
+        goals
     };
-  
+
     return organizedData;
-  }
+}

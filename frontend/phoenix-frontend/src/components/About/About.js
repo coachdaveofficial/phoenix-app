@@ -16,19 +16,19 @@ export default function About({ youtubeLink, instagramLink, facebookLink, league
                     <svg className="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
                 </p>
                 <a href={leagueLink} className="group inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-gray-900 rounded-lg border border-gray-900 hover:bg-blue-700 hover:text-white hover:border-white focus:ring-4 focus:ring-gray-100" rel="noopener noreferrer" target="_blank">
-                    <svg className="w-5 h-5 mr-2 text-gray-900 group-hover:text-white" ariaHidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                    <svg className="w-5 h-5 mr-2 text-gray-900 group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
                         <path className="hover:text-gray-100" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11v4.833A1.166 1.166 0 0 1 13.833 17H2.167A1.167 1.167 0 0 1 1 15.833V4.167A1.166 1.166 0 0 1 2.167 3h4.618m4.447-2H17v5.768M9.111 8.889l7.778-7.778" />
                     </svg>
                     Our League
                 </a>
                 <a href={OASALink} className="group inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-gray-900 rounded-lg border border-gray-900 hover:bg-blue-700 hover:text-white hover:border-white focus:ring-4 focus:ring-gray-100" rel="noopener noreferrer" target="_blank">
-                    <svg className="w-5 h-5 mr-2 text-gray-900 group-hover:text-white" ariaHidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                    <svg className="w-5 h-5 mr-2 text-gray-900 group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
                         <path className="hover:text-gray-100" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11v4.833A1.166 1.166 0 0 1 13.833 17H2.167A1.167 1.167 0 0 1 1 15.833V4.167A1.166 1.166 0 0 1 2.167 3h4.618m4.447-2H17v5.768M9.111 8.889l7.778-7.778" />
                     </svg>
                     Our Association
                 </a>
                 <a href={indoorLink} className="group inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-gray-900 rounded-lg border border-gray-900 hover:bg-blue-700 hover:text-white hover:border-white focus:ring-4 focus:ring-gray-100" rel="noopener noreferrer" target="_blank">
-                    <svg className="w-5 h-5 mr-2 text-gray-900 group-hover:text-white" ariaHidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                    <svg className="w-5 h-5 mr-2 text-gray-900 group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
                         <path className="hover:text-gray-100" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11v4.833A1.166 1.166 0 0 1 13.833 17H2.167A1.167 1.167 0 0 1 1 15.833V4.167A1.166 1.166 0 0 1 2.167 3h4.618m4.447-2H17v5.768M9.111 8.889l7.778-7.778" />
                     </svg>
                     Our Indoor League
@@ -38,7 +38,7 @@ export default function About({ youtubeLink, instagramLink, facebookLink, league
                 <span className="font-semibold text-white uppercase">FOLLOW US ON SOCIAL MEDIA</span>
                 <div className="flex flex-wrap justify-center items-center mt-8 text-gray-900 sm:justify-between">
                     <a href={facebookLink} className="mr-5 mb-5 lg:mb-0 hover:text-gray-400" rel="noopener noreferrer" target="_blank">
-                        <svg className="h-11 hover:text-gray-400" ariaHidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 50 50">
+                        <svg className="h-11 hover:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 50 50">
                             <path className="hover:text-gray-400" d="M25,3C12.85,3,3,12.85,3,25c0,11.03,8.125,20.137,18.712,21.728V30.831h-5.443v-5.783h5.443v-3.848 c0-6.371,3.104-9.168,8.399-9.168c2.536,0,3.877,0.188,4.512,0.274v5.048h-3.612c-2.248,0-3.033,2.131-3.033,4.533v3.161h6.588 l-0.894,5.783h-5.694v15.944C38.716,45.318,47,36.137,47,25C47,12.85,37.15,3,25,3z"></path>
                         </svg>
                     </a>
