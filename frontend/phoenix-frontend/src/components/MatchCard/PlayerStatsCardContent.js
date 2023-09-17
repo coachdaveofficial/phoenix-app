@@ -5,7 +5,10 @@ const titleClass = "text-xl font-semibold mb-4";
 const listItemClass = "mb-2 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg";
 
 export default function PlayerStatsCardContent({ isActive, loading, allTimeGoalScorers, allTimeAssisters, recentSeasonTopScorers, recentSeasonMostAssists }) {
-
+    if (recentSeasonTopScorers) {
+        console.log(recentSeasonTopScorers.data)
+    }
+    
     return isActive && (
 
         <>
@@ -36,16 +39,27 @@ export default function PlayerStatsCardContent({ isActive, loading, allTimeGoalS
                     </div>
 
                     <div>
-                        <h2 className={titleClass}>Current Season Most Goals</h2>
+                        <h2 className={titleClass}>{recentSeasonTopScorers.season.name} Most Goals</h2>
                         <ul className="list-disc pl-4">
-                            {recentSeasonTopScorers && recentSeasonTopScorers.map((player, idx) => (
-                                <li key={idx} className={listItemClass}>
+                            {/* check to see if data is an array of players */}
+                            {/* if data is not array, then there are no data for this season, display error message */}
+                            {Array.isArray(recentSeasonTopScorers.data) ?
+                                recentSeasonTopScorers.data.map((player, idx) => (
+                                    <li key={idx} className={listItemClass}>
+                                        <div className="flex justify-between">
+                                            <span>{player.player_name}</span>
+                                            <span className="font-semibold">{player.goals} goals</span>
+                                        </div>
+                                    </li>
+                                ))
+                                :
+                                <li className={listItemClass}>
                                     <div className="flex justify-between">
-                                        <span>{player.player_name}</span>
-                                        <span className="font-semibold">{player.goals} goals</span>
+                                        <span>{recentSeasonTopScorers.data.message}</span>
                                     </div>
                                 </li>
-                            ))}
+                            }
+
                         </ul>
                     </div>
 
@@ -63,16 +77,27 @@ export default function PlayerStatsCardContent({ isActive, loading, allTimeGoalS
                         </ul>
                     </div>
                     <div>
-                        <h2 className={titleClass}>Current Season Most Assists</h2>
+                        <h2 className={titleClass}>{recentSeasonMostAssists.season.name} Most Assists</h2>
                         <ul className="list-disc pl-4">
-                            {recentSeasonMostAssists && recentSeasonMostAssists.map((player, idx) => (
-                                <li key={idx} className={listItemClass}>
+                            {/* check to see if data is an array of players */}
+                            {/* if data is not array, then there are no data for this season, display error message */}
+                            {Array.isArray(recentSeasonMostAssists.data) ?
+                                recentSeasonMostAssists.data.map((player, idx) => (
+                                    <li key={idx} className={listItemClass}>
+                                        <div className="flex justify-between">
+                                            <span>{player.player_name}</span>
+                                            <span className="font-semibold">{player.assists} assists</span>
+                                        </div>
+                                    </li>
+                                ))
+                                :
+                                <li className={listItemClass}>
                                     <div className="flex justify-between">
-                                        <span>{player.player_name}</span>
-                                        <span className="font-semibold">{player.assists} assists</span>
+                                        <span>{recentSeasonMostAssists.data.message}</span>
                                     </div>
                                 </li>
-                            ))}
+                            }
+
                         </ul>
                     </div>
                 </div>
