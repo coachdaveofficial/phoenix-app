@@ -433,7 +433,7 @@ class PlayerService:
         top_scorers_query = query.all()
 
         if not top_scorers_query:
-            return None
+            return {"message": "No goals have been recorded yet for this season", "season": SeasonService.jsonify_season(season)}
 
         # Find the maximum goals scored
         max_goals = top_scorers_query[0][2]  # Get the goals of the first player
@@ -488,7 +488,7 @@ class PlayerService:
         most_assists_query = query.all()
 
         if not most_assists_query:
-            return None
+            return {"message": "No assists have been recorded yet for this season", "season": SeasonService.jsonify_season(season)}
 
         # Find the maximum goals scored
         max_assists = most_assists_query[0][2]  # Get the goals of the first player
@@ -640,53 +640,50 @@ class MatchService:
     def get_next_upcoming_match_by_team_id(team_id):
         current_date = datetime.now()
 
-        # query for matches with future dates for the specified team
-        upcoming_match = Match.query.filter(
-            or_(
-                Match.home_team_id == team_id, 
-                Match.away_team_id == team_id
-            )).order_by(asc(Match.date)).first()
-
-        if current_date > upcoming_match.date:
+        match = (Match.query
+            .filter(
+                or_(Match.home_team_id == team_id, Match.away_team_id == team_id),
+                Match.date >= current_date
+            )
+            .order_by(asc(Match.date))
+            .first()
+        )
+        if not match:
             return None
-
-        return upcoming_match
+        return match
 
     @staticmethod
     def get_most_recent_previous_match_by_team_id(team_id):
         current_date = datetime.now()
 
-        # query for matches with past dates for the specified team
-        previous_match = Match.query.filter(
-        or_(
-            Match.home_team_id == team_id,
-            Match.away_team_id == team_id
-        )).order_by(desc(Match.date)).first()
-        if not previous_match:
+
+        match = (Match.query
+            .filter(
+                or_(Match.home_team_id == team_id, Match.away_team_id == team_id),
+                Match.date < current_date
+            )
+            .order_by(desc(Match.date))
+            .first()
+        )
+        if not match:
             return None
-        if current_date < previous_match.date:
-            return None
-        
-        return previous_match
+        return match
    
     @staticmethod
     def get_all_previous_matches_by_team_id(team_id):
         current_date = datetime.now()
-        previous_matches = []
         # query for matches with past dates for the specified team
-        previous_match_results = Match.query.filter(
-        or_(
-            Match.home_team_id == team_id,
-            Match.away_team_id == team_id
-        )).order_by(desc(Match.date)).all()
-
-        for match in previous_match_results:
-            # skip all future match dates
-            if current_date < match.date:
-                continue
-            previous_matches.append(match)
-
-        return previous_matches
+        matches = (Match.query
+            .filter(
+                or_(Match.home_team_id == team_id, Match.away_team_id == team_id),
+                Match.date < current_date
+            )
+            .order_by(desc(Match.date))
+            .all()
+        )
+        if not matches:
+            return None
+        return matches
 
 class UserService:
     """Services for getting user info"""
