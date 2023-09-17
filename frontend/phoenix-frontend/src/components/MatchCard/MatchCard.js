@@ -38,8 +38,9 @@ export default function MatchCard({ phoenixTeam }) {
 
             try {
                 const upcomingMatchResp = await axios.get(`${API_BASE_URL}/matches/${phoenixTeamObj.id}/upcoming`);
-                setUpcomingData(organizeMatchData(upcomingMatchResp));
+                setUpcomingData(organizeMatchData(upcomingMatchResp.data));
             } catch (e) {
+                console.log(e)
                 setUpcomingData(false);
             }
             setLoading(false)
@@ -91,11 +92,10 @@ export default function MatchCard({ phoenixTeam }) {
                         isActive={activeTab === 'Upcoming'}
                         phoenixLogo={logoUrl}
                         phoenixTeam={phoenixTeam}
-                        opposingTeam={prevData.opposingTeam.name}
-                        score={`${prevData.score}`}
-                        location={prevData.location}
-                        date={prevData.date}
-                        time={prevData.time}
+                        opposingTeam={upcomingData.opposingTeam.name}
+                        location={upcomingData.location}
+                        date={upcomingData.date}
+                        time={upcomingData.time}
 
                     />
                     :
