@@ -53,8 +53,14 @@ export default function MatchCardContent({ isActive, loading, children, phoenixL
                                 </ul>
 
                                 <div className="text-center">
-                                    <p className="text-2xl font-normal text-gray-700 dark:text-white"><b className='text-orange-400'>{phoenixScore}</b> - {oppScore}</p>
-                                    <p className="font-normal text-gray-700 dark:text-white">Time: {time}</p>
+                                    {score &&
+                                        <p className="text-2xl font-normal text-gray-700 dark:text-white">
+                                            <b className='text-orange-400'>{phoenixScore}</b> - {oppScore}
+                                        </p>
+                                    }
+
+
+                                    <p className="font-normal text-gray-700 dark:text-white">Time: {time} PST</p>
                                     <p className="font-normal text-gray-700 dark:text-white">Date: {date}</p>
                                     <p className="font-normal text-gray-700 dark:text-white">Location: {location}</p>
                                 </div>
