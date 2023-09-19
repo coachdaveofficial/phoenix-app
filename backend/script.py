@@ -117,10 +117,18 @@ class SeasonDataExtractor:
 
     def insert_data(self, data_list):
         for data in data_list:
-            year = data['year']
-            season_name = data['season']
-            team_type = data['team_type']
-            worksheet = self.sh.worksheet(data['worksheet'])
+            try:
+                year = data['year']
+                print(year)
+                season_name = data['season']
+                team_type = data['team_type']
+            except Exception as e:
+                return {"status": {"success": False, "message": e, "worksheet_error": False}}
+            try:
+                worksheet = self.sh.worksheet(data['worksheet'])
+            except Exception as e:                
+                return {"status": {"success": False, "message": f'{e} is not a valid worksheet name', "worksheet_error": True}}
+
             worksheet_cells = worksheet.get("A1:G100")
             worksheet_data = self.extract_season_data(worksheet_cells)
 
@@ -242,6 +250,7 @@ class SeasonDataExtractor:
                         db.session.commit()
 
         print("Data insertion successful!")
+        return {"status": {"success": True, "message": "Data insertion successful!"}}
 
 
     
