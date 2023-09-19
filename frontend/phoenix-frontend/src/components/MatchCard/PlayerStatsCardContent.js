@@ -5,9 +5,6 @@ const titleClass = "text-xl font-semibold mb-4";
 const listItemClass = "mb-2 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg";
 
 export default function PlayerStatsCardContent({ isActive, loading, allTimeGoalScorers, allTimeAssisters, recentSeasonTopScorers, recentSeasonMostAssists }) {
-    if (recentSeasonTopScorers) {
-        console.log(recentSeasonTopScorers.data)
-    }
     
     return isActive && (
 
