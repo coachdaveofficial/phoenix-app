@@ -25,24 +25,11 @@ export default function MatchCard({ phoenixTeam }) {
 
     useEffect(() => {
         const getTeamData = async () => {
-            const phoenixTeamResp = await axios.get(`${API_BASE_URL}/teams/?name=${phoenixTeam}`);
-            const phoenixTeamObj = phoenixTeamResp.data[0];
-            const prevMatchResp = await axios.get(`${API_BASE_URL}/matches/${phoenixTeamObj.id}/previous`);
-            const mostGoalsResp = await axios.get(`${API_BASE_URL}/players/mostgoals/?team_name=${phoenixTeamObj.name}`);
-            const mostAssistsResp = await axios.get(`${API_BASE_URL}/players/mostassists/?team_name=${phoenixTeamObj.name}`);
-            const recentSeasonGoalsResp = await axios.get(`${API_BASE_URL}/players/mostgoals/?team_name=${phoenixTeamObj.name}&recent=True`);
-            const recentSeasonAssistsResp = await axios.get(`${API_BASE_URL}/players/mostassists/?team_name=${phoenixTeamObj.name}&recent=True`);
-            setPrevData(organizeMatchData(prevMatchResp.data));
-            setMostGoalsAndAssistsData({ mostGoals: mostGoalsResp.data, mostAssists: mostAssistsResp.data });
-            setRecentSeasonsRecords({ mostGoals: recentSeasonGoalsResp.data, mostAssists: recentSeasonAssistsResp.data })
-
-            try {
-                const upcomingMatchResp = await axios.get(`${API_BASE_URL}/matches/${phoenixTeamObj.id}/upcoming`);
-                setUpcomingData(organizeMatchData(upcomingMatchResp.data));
-            } catch (e) {
-                // console.log(e)
-                setUpcomingData(false);
-            }
+            const phoenixTeamData = await axios.get(`${API_BASE_URL}/dashboard/teamdata/?team_name=${phoenixTeam}`);
+            setPrevData(organizeMatchData(phoenixTeamData.data.prev_match));
+            setMostGoalsAndAssistsData({ mostGoals: phoenixTeamData.data.most_goals, mostAssists: phoenixTeamData.data.most_assists });
+            setRecentSeasonsRecords({ mostGoals: phoenixTeamData.data.recent_goals, mostAssists: phoenixTeamData.data.recent_assists });
+            setUpcomingData(organizeMatchData(phoenixTeamData.data.upcoming_match));
             setLoading(false)
         }
         getTeamData();

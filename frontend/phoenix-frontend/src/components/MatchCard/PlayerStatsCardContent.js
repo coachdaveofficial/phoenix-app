@@ -36,12 +36,12 @@ export default function PlayerStatsCardContent({ isActive, loading, allTimeGoalS
                     </div>
 
                     <div>
-                        <h2 className={titleClass}>{recentSeasonTopScorers.season.name} Most Goals</h2>
+                        <h2 className={titleClass}>{recentSeasonTopScorers.season_name} Most Goals</h2>
                         <ul className="list-disc pl-4">
                             {/* check to see if data is an array of players */}
                             {/* if data is not array, then there are no data for this season, display error message */}
-                            {Array.isArray(recentSeasonTopScorers.data) ?
-                                recentSeasonTopScorers.data.map((player, idx) => (
+                            {Array.isArray(recentSeasonTopScorers) ?
+                                recentSeasonTopScorers.map((player, idx) => (
                                     <li key={idx} className={listItemClass}>
                                         <div className="flex justify-between">
                                             <span>{player.player_name}</span>
@@ -52,7 +52,7 @@ export default function PlayerStatsCardContent({ isActive, loading, allTimeGoalS
                                 :
                                 <li className={listItemClass}>
                                     <div className="flex justify-between">
-                                        <span>{recentSeasonTopScorers.data.message}</span>
+                                        <span>No goals have been recorded yet for this season</span>
                                     </div>
                                 </li>
                             }
@@ -74,12 +74,12 @@ export default function PlayerStatsCardContent({ isActive, loading, allTimeGoalS
                         </ul>
                     </div>
                     <div>
-                        <h2 className={titleClass}>{recentSeasonMostAssists.season.name} Most Assists</h2>
+                        <h2 className={titleClass}>{recentSeasonMostAssists.season_name} Most Assists</h2>
                         <ul className="list-disc pl-4">
                             {/* check to see if data is an array of players */}
                             {/* if data is not array, then there are no data for this season, display error message */}
-                            {Array.isArray(recentSeasonMostAssists.data) ?
-                                recentSeasonMostAssists.data.map((player, idx) => (
+                            {Array.isArray(recentSeasonMostAssists) ?
+                                recentSeasonMostAssists.map((player, idx) => (
                                     <li key={idx} className={listItemClass}>
                                         <div className="flex justify-between">
                                             <span>{player.player_name}</span>
@@ -90,7 +90,7 @@ export default function PlayerStatsCardContent({ isActive, loading, allTimeGoalS
                                 :
                                 <li className={listItemClass}>
                                     <div className="flex justify-between">
-                                        <span>{recentSeasonMostAssists.data.message}</span>
+                                        <span>No assists have been recorded yet for this season</span>
                                     </div>
                                 </li>
                             }
