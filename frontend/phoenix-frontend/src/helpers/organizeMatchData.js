@@ -1,14 +1,18 @@
 export default function organizeMatchData(data) {
-    // Parse the date string into a Date object
+
+    // data can be null if there is no match data being passed
+    // for example, if there is no upcoming match data available for a specific team
+    if (!data) {
+        return undefined
+    }
+
     const matchDate = new Date(data.date);
 
-    // Format the date string without converting the time zone to local time
     const options = {
         hour: '2-digit',
         minute: '2-digit',
         timeZone: 'UTC'
     };
-
 
     // Extract time and date components
     const matchTime = matchDate.toLocaleTimeString([], options);

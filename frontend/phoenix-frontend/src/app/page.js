@@ -27,7 +27,6 @@ export default function Homepage() {
         indoorLink={"https://pdxindoorsoccer.com/"}
         />
       </ScrollSectionAbout>
-      <LoginForm login={login}/>
     </>
   )
 }
