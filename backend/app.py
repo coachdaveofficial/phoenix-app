@@ -12,6 +12,7 @@ from blueprints.players.players import players_bp
 from blueprints.teams.teams import teams_bp
 from blueprints.matches.matches import matches_bp
 from blueprints.seasons.seasons import seasons_bp
+from blueprints.dashboard.dashboard import dashboard_bp
 from blueprints.script.script_route import script_bp
 from blueprints.auth.auth import auth_bp, CURR_USER_KEY
 
@@ -23,6 +24,7 @@ app.register_blueprint(teams_bp, url_prefix='/api')
 app.register_blueprint(matches_bp, url_prefix='/api')
 app.register_blueprint(seasons_bp, url_prefix='/api')
 app.register_blueprint(script_bp, url_prefix='/api')
+app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
 app.register_blueprint(auth_bp, url_prefix='/auth')
 
 
