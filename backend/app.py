@@ -12,15 +12,18 @@ from blueprints.players.players import players_bp
 from blueprints.teams.teams import teams_bp
 from blueprints.matches.matches import matches_bp
 from blueprints.seasons.seasons import seasons_bp
+from blueprints.script.script_route import script_bp
 from blueprints.auth.auth import auth_bp, CURR_USER_KEY
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}, r"/auth": {"origins": "http://localhost:3000"}})
+
 app.register_blueprint(players_bp, url_prefix='/api')
 app.register_blueprint(teams_bp, url_prefix='/api')
 app.register_blueprint(matches_bp, url_prefix='/api')
 app.register_blueprint(seasons_bp, url_prefix='/api')
-app.register_blueprint(auth_bp, url_prefix='/')
+app.register_blueprint(script_bp, url_prefix='/api')
+app.register_blueprint(auth_bp, url_prefix='/auth')
 
 
 
@@ -44,36 +47,27 @@ connect_db(app)
 # db.drop_all()
 db.create_all()
 
-@app.before_request
-def add_user_to_g():
-    """If we're logged in, add curr user to Flask global."""
-
-    if CURR_USER_KEY in session:
-        g.user = User.query.get(session[CURR_USER_KEY])
-        # g.user = db.session(User).get(session[CURR_USER_KEY])
-
-    else:
-        g.user = None
-
-    print(g.user)
 
 extractor = SeasonDataExtractor("phoenix-fc-sheets-COPY.json", "Copy of Phoenix Historical Stats")
 
 
 
 
-seed_o30()
-seed_players()
-seed_o40()
+# seed_o30()
+# seed_players()
+# seed_o40()
 
-extractor.insert_data([{'worksheet': "Spring 2023 Open", "year": "2023", "season": "Spring", "team_type": "Open"}])
-extractor.insert_data([{'worksheet': "Winter 2023 Open", "year": "2023", "season": "Winter", "team_type": "Open"}])
-extractor.insert_data([{'worksheet': "Spring 2023 O30", "year": "2023", "season": "Spring", "team_type": "O30"}])
-extractor.insert_data([{'worksheet': "Spring 2023 O40", "year": "2023", "season": "Spring", "team_type": "O40"}])
-extractor.insert_data([{'worksheet': "Winter 2023 O40", "year": "2023", "season": "Winter", "team_type": "O40"}])
-extractor.insert_data([{'worksheet': "Fall 2022 O40", "year": "2022", "season": "Fall", "team_type": "O40"}])
-extractor.insert_data([{'worksheet': "Spring 2022 O40", "year": "2022", "season": "Spring", "team_type": "O40"}])
-extractor.insert_data([{'worksheet': "Winter 2022 O40", "year": "2022", "season": "Winter", "team_type": "O40"}])
+# extractor.insert_data([{'worksheet': "fart", "year": "2023", "season": "Spring", "team_type": "Open"}])
+# extractor.insert_data([{'worksheet': "Spring 2023 Open", "year": "2023", "season": "Spring", "team_type": "Open"}])
+# extractor.insert_data([{'worksheet': "Winter 2023 Open", "year": "2023", "season": "Winter", "team_type": "Open"}])
+# extractor.insert_data([{'worksheet': "Fall 2023 Open", "year": "2023", "season": "Fall", "team_type": "Open"}])
+# extractor.insert_data([{'worksheet': "Fall 2023 O30", "year": "2023", "season": "Fall", "team_type": "O30"}])
+# extractor.insert_data([{'worksheet': "Spring 2023 O30", "year": "2023", "season": "Spring", "team_type": "O30"}])
+# extractor.insert_data([{'worksheet': "Spring 2023 O40", "year": "2023", "season": "Spring", "team_type": "O40"}])
+# extractor.insert_data([{'worksheet': "Winter 2023 O40", "year": "2023", "season": "Winter", "team_type": "O40"}])
+# extractor.insert_data([{'worksheet': "Fall 2022 O40", "year": "2022", "season": "Fall", "team_type": "O40"}])
+# extractor.insert_data([{'worksheet': "Spring 2022 O40", "year": "2022", "season": "Spring", "team_type": "O40"}])
+# extractor.insert_data([{'worksheet': "Winter 2022 O40", "year": "2022", "season": "Winter", "team_type": "O40"}])
 
 
 if __name__ == "__main__":

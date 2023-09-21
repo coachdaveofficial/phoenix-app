@@ -40,7 +40,7 @@ export default function MatchCard({ phoenixTeam }) {
                 const upcomingMatchResp = await axios.get(`${API_BASE_URL}/matches/${phoenixTeamObj.id}/upcoming`);
                 setUpcomingData(organizeMatchData(upcomingMatchResp.data));
             } catch (e) {
-                console.log(e)
+                // console.log(e)
                 setUpcomingData(false);
             }
             setLoading(false)

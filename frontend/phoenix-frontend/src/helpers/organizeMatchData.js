@@ -1,8 +1,6 @@
 export default function organizeMatchData(data) {
     // Parse the date string into a Date object
     const matchDate = new Date(data.date);
-    console.log(`${data.home_team.name} vs ${data.away_team.name} `, matchDate)
-
 
     // Format the date string without converting the time zone to local time
     const options = {
@@ -10,9 +8,6 @@ export default function organizeMatchData(data) {
         minute: '2-digit',
         timeZone: 'UTC'
     };
-
-    // { hour: '2-digit', minute: '2-digit', hour12: true }
-
 
 
     // Extract time and date components

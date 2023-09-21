@@ -5,6 +5,8 @@ import ScrollSectionAbout from '@/components/ScrollSections/ScrollSectionAbout';
 import NavBarFunc from '@/components/Navbar/Navbar';
 import MatchCard from '@/components/MatchCard/MatchCard';
 import About from '@/components/About/About';
+import LoginForm from '@/components/Auth/LoginForm';
+import login from '@/helpers/login'
 
 export default function Homepage() {
   return (
@@ -25,6 +27,7 @@ export default function Homepage() {
         indoorLink={"https://pdxindoorsoccer.com/"}
         />
       </ScrollSectionAbout>
+      <LoginForm login={login}/>
     </>
   )
 }
