@@ -9,8 +9,9 @@ CURR_USER_KEY = "curr_user"
 
 def do_login(user):
     """Log in user."""
-
+    print(user.id, "user_id")
     session[CURR_USER_KEY] = user.id
+    print(session, "do login session")
 
 def do_logout():
     """Logout user."""
@@ -25,6 +26,18 @@ def login_required(view_func):
             return make_response({"message": "You are not authorized to access this page"}, 401)
         return view_func(*args, **kwargs)
     return wrapped_view
+
+@auth_bp.before_app_request
+def add_user_to_g():
+    """If we're logged in, add curr user to Flask global."""
+    if CURR_USER_KEY in session:
+        g.user = User.query.get(session[CURR_USER_KEY])
+        # g.user = db.session.query(User).get(session[CURR_USER_KEY])
+
+    else:
+        g.user = None
+    print(g.user)
+    print(session)
 
 @auth_bp.route('/@me', methods=["GET"])
 @cross_origin(supports_credentials=True)
@@ -69,13 +82,13 @@ def login():
     user = UserService.authenticate(username, password)
     if not user:
         return make_response(jsonify({"message": "Invalid username or password. Please try again"}), 401)
+    print(user, "user")
     do_login(user)
     return make_response(jsonify({"message": "Login successful"}), 200)
 
-@auth_bp.route('/logout/', methods=["GET"])
+@auth_bp.route('/logout/', methods=["POST"])
 def logout():
     """Handle logout of user."""
     
-
     do_logout()
     return make_response(jsonify({"message": "Successfully logged out"}), 200)
