@@ -22,19 +22,19 @@ export default function organizeMatchData(data) {
     const location = data.venue;
     const goals = data.goals;
 
-    let score;
+    let score = undefined;
     let opposingTeam;
     // Ensure the Phoenix score comes first when displaying score
     if (data.home_team.name.startsWith("Phoenix")) {
         // score may not be present if is a future match
-        if (data.score) {
+        if (data.score && data.score !== 'vs') {
             score = `${data.score.home} - ${data.score.away}`;
         }
 
         opposingTeam = data.away_team;
     } else {
         //  score may not be present if is a future match
-        if (data.score) {
+        if (data.score && data.score !== 'vs') {
             score = `${data.score.away} - ${data.score.home}`;
         }
 
