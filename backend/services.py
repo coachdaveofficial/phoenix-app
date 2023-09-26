@@ -254,7 +254,9 @@ class PlayerService:
                 .order_by(desc(func.count(Goal.id)))
                 .filter(Player.team_id == team_id)
             )
-
+            if query.first() == None:
+                return None
+                
             most_goals_count = query.first().goals_count
 
             players_with_most_goals = (
@@ -273,7 +275,9 @@ class PlayerService:
                 .with_entities(Player.id, func.count(Goal.id).label('goals_count'))
                 .order_by(desc(func.count(Goal.id)))
             )
-
+            if query.first() == None:
+                return None
+            
             most_goals_count = query.first().goals_count
 
             players_with_most_goals = (
@@ -298,7 +302,8 @@ class PlayerService:
                 .order_by(desc(func.count(Assist.id)))
                 .filter(Player.team_id == team_id)
             )
-        
+            if query.first() == None:
+                return None
             most_assists_count = query.first().assists_count
 
             players_with_most_assists = (
@@ -317,7 +322,8 @@ class PlayerService:
                 .with_entities(Player.id, func.count(Assist.id).label('assists_count'))
                 .order_by(desc(func.count(Assist.id)))
             )
-        
+            if query.first() == None:
+                return None
             most_assists_count = query.first().assists_count
 
             players_with_most_assists = (
