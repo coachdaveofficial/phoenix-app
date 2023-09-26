@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Tab from './Tab';
-import MatchCardContent from './MatchCardContent';
+import MatchCardContent from './MatchCardContent'
 import PlayerStatsCardContent from './PlayerStatsCardContent';
 import organizeMatchData from '@/helpers/organizeMatchData';
 import { PropagateLoader } from 'react-spinners';
@@ -27,8 +27,15 @@ export default function MatchCard({ phoenixTeam }) {
         const getTeamData = async () => {
             const phoenixTeamData = await axios.get(`${API_BASE_URL}/dashboard/teamdata/?team_name=${phoenixTeam}`);
             setPrevData(organizeMatchData(phoenixTeamData.data.prev_match));
-            setMostGoalsAndAssistsData({ mostGoals: phoenixTeamData.data.most_goals, mostAssists: phoenixTeamData.data.most_assists });
-            setRecentSeasonsRecords({ mostGoals: phoenixTeamData.data.recent_goals, mostAssists: phoenixTeamData.data.recent_assists });
+            setMostGoalsAndAssistsData({
+                mostGoals: phoenixTeamData.data.most_goals,
+                mostAssists: phoenixTeamData.data.most_assists
+            });
+            setRecentSeasonsRecords({
+                mostGoals: phoenixTeamData.data.recent_goals,
+                mostAssists: phoenixTeamData.data.recent_assists,
+                season: phoenixTeamData.data.recent_season
+            });
             setUpcomingData(organizeMatchData(phoenixTeamData.data.upcoming_match));
             setLoading(false)
         }
@@ -125,6 +132,7 @@ export default function MatchCard({ phoenixTeam }) {
                         allTimeAssisters={mostGoalsAndAssistsData.mostAssists}
                         recentSeasonTopScorers={recentSeasonRecords.mostGoals}
                         recentSeasonMostAssists={recentSeasonRecords.mostAssists}
+                        recentSeason={recentSeasonRecords.season}
 
                     />
 
