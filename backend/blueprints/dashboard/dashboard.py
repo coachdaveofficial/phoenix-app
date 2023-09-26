@@ -25,15 +25,23 @@ def get_team_data():
     recent_season = SeasonService.get_most_recent_season()
     recent_goals = PlayerService.get_top_goal_scorers_by_season(recent_season.id, team.id)
     recent_assists = PlayerService.get_most_assists_by_season(recent_season.id, team.id)
-    most_goals_list = [PlayerService.jsonify_player(p) for p in most_goals]
-    most_assists_list = [PlayerService.jsonify_player(p) for p in most_assists]
-    # recent_goals_list = [PlayerService.jsonify_player(p) for p in recent_goals]
-    # recent_assists_list = [PlayerService.jsonify_player(p) for p in recent_assists]
+    if most_goals is not None:
+        most_goals_list = [PlayerService.jsonify_player(p) for p in most_goals]
+    else:
+        most_goals_list = None
+    if most_assists is not None:
+        most_assists_list = [PlayerService.jsonify_player(p) for p in most_assists]
+    else: 
+        most_assists_list = None
+    if recent_season is not None:
+        recent_season = SeasonService.jsonify_season(recent_season)
+
     return make_response({
         "prev_match": prev_match,
         "upcoming_match": upcoming_match,
         "most_assists": most_assists_list,
         "most_goals": most_goals_list,
         "recent_assists": recent_assists,
-        "recent_goals": recent_goals
+        "recent_goals": recent_goals,
+        "recent_season": recent_season
     }, 200)
