@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, make_response, request
-from services import TeamService
+from services import TeamService, MatchService, PlayerService, SeasonService
 from models import PositionType
 from blueprints.auth.auth import login_required
 
@@ -62,3 +62,22 @@ def update_or_delete_team(team_id):
             return jsonify(response), 200
         else:
             return jsonify(response), 500
+        
+
+@teams_bp.route("/teams/stats/", methods=["GET"])
+def get_team_stats():
+    team_name = request.args.get('team_name')
+    if team_name:
+        team_stats = TeamService.get_team_stats_as_json(team_name)
+        if not team_stats:
+            return make_response({"message": "Could not find team, please check the provided team name and try again"}, 400)
+        
+        return make_response(team_stats, 200)
+    
+    open_stats = TeamService.get_team_stats_as_json("open")
+    thirty_stats = TeamService.get_team_stats_as_json("o30")
+    forty_stats = TeamService.get_team_stats_as_json("o40")
+
+    return make_response({"openStats": open_stats, "overThirtyStats": thirty_stats, "overFortyStats": forty_stats}, 200)
+    
+    
