@@ -8,39 +8,26 @@ import { PropagateLoader } from 'react-spinners';
 
 const logoUrl = '/phoenixfc_logo.jpeg'
 
-import axios from "axios";
-const API_BASE_URL = 'http://127.0.0.1:8080/api';
-
-export default function MatchCard({ phoenixTeam }) {
+export default function MatchCard({ phoenixTeam, teamData }) {
     const [activeTab, setActiveTab] = useState('Upcoming');
-    const [prevData, setPrevData] = useState(null);
-    const [upcomingData, setUpcomingData] = useState(null);
-    const [mostGoalsAndAssistsData, setMostGoalsAndAssistsData] = useState({});
-    const [recentSeasonRecords, setRecentSeasonsRecords] = useState({});
     const [loading, setLoading] = useState(true);
+
+
+    const prevData = organizeMatchData(teamData.prev_match);
+    const upcomingData = organizeMatchData(teamData.upcoming_match);
+    const mostGoalsAndAssistsData = { mostGoals: teamData.most_goals, mostAssists: teamData.most_assists };
+    const recentSeasonRecords = {
+        mostGoals: teamData.recent_goals,
+        mostAssists: teamData.recent_assists,
+        season: teamData.recent_season
+    };
+    setLoading(false);
+
 
     const handleTabClick = (tab) => {
         setActiveTab(tab);
     };
 
-    useEffect(() => {
-        const getTeamData = async () => {
-            const phoenixTeamData = await axios.get(`${API_BASE_URL}/dashboard/teamdata/?team_name=${phoenixTeam}`);
-            setPrevData(organizeMatchData(phoenixTeamData.data.prev_match));
-            setMostGoalsAndAssistsData({
-                mostGoals: phoenixTeamData.data.most_goals,
-                mostAssists: phoenixTeamData.data.most_assists
-            });
-            setRecentSeasonsRecords({
-                mostGoals: phoenixTeamData.data.recent_goals,
-                mostAssists: phoenixTeamData.data.recent_assists,
-                season: phoenixTeamData.data.recent_season
-            });
-            setUpcomingData(organizeMatchData(phoenixTeamData.data.upcoming_match));
-            setLoading(false)
-        }
-        getTeamData();
-    }, [])
 
     return (
         <div className="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
@@ -108,7 +95,7 @@ export default function MatchCard({ phoenixTeam }) {
                         phoenixLogo={logoUrl}
                         phoenixTeam={phoenixTeam}
                         opposingTeam={prevData.opposingTeam.name}
-                        score={`${prevData.score}`}
+                        score={prevData.score}
                         location={prevData.location}
                         date={prevData.date}
                         time={prevData.time}
