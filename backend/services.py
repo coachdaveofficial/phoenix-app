@@ -99,6 +99,45 @@ class TeamService:
             db.session.rollback()
             return False, {"message": "Failed to delete team"}
 
+    @staticmethod
+    def get_team_stats_as_json(team_name):
+        team = TeamService.get_team_by_name(team_name)
+        
+        if not team:
+            return None
+
+        prev_match = MatchService.jsonify_match(MatchService.get_most_recent_previous_match_by_team_id(team.id))
+        upcoming_match = MatchService.get_next_upcoming_match_by_team_id(team.id)
+
+        try:
+            upcoming_match = MatchService.jsonify_match(upcoming_match)
+        except AttributeError:
+            upcoming_match = None
+
+        most_goals = PlayerService.get_player_with_most_goals(team.id)
+        most_assists = PlayerService.get_player_with_most_assists(team.id)
+        recent_season = SeasonService.get_most_recent_season()
+        recent_goals = PlayerService.get_top_goal_scorers_by_season(recent_season.id, team.id)
+        recent_assists = PlayerService.get_most_assists_by_season(recent_season.id, team.id)
+
+        if most_goals is not None:
+            most_goals = [PlayerService.jsonify_player(p) for p in most_goals]
+
+        if most_assists is not None:
+            most_assists = [PlayerService.jsonify_player(p) for p in most_assists]
+            
+        if recent_season is not None:
+            recent_season = SeasonService.jsonify_season(recent_season)
+
+        return {
+            "prev_match": prev_match,
+            "upcoming_match": upcoming_match,
+            "most_assists": most_assists,
+            "most_goals": most_goals,
+            "recent_assists": recent_assists,
+            "recent_goals": recent_goals,
+            "recent_season": recent_season
+        }
 
 class PlayerService:
 
