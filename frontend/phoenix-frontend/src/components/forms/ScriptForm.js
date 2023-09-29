@@ -3,7 +3,7 @@ import axios from "axios";
 import Alert from '../common/Alert';
 export default function ScriptForm() {
     
-
+    const API_BASE_URL = 'http://127.0.0.1:8080/api'
     const INITIAL_STATE = {
         worksheet: "",
         year: "",
@@ -13,7 +13,6 @@ export default function ScriptForm() {
     const [formData, setFormData] = useState(INITIAL_STATE)
     const [formErrors, setFormErrors] = useState([])
     const [formSuccessMsg, setFormSuccessMsg] = useState([])
-    console.log(formData)
 
     const handleChange = (evt) => {
         const { name, value } = evt.target;
@@ -26,15 +25,17 @@ export default function ScriptForm() {
     const handleSubmit = async (evt) => {
         evt.preventDefault();
         try {
-            let result = await axios.post(`http://127.0.0.1:8080/api/script/`, formData, { withCredentials: true });
+            let result = await axios.post(`${API_BASE_URL}/script/`, formData, { withCredentials: true });
             console.log(result)
             if (result.status === 201) {
                 console.log("success")
-                setFormSuccessMsg([result.data.message])
-                setFormData(INITIAL_STATE)
+                setFormSuccessMsg([result.data.message]);
+                setFormData(INITIAL_STATE);
+                setFormErrors([]);
+
             }
         } catch (e) {
-            console.log("test", e.response.data.message)
+            console.log(e);
             setFormErrors([e.response.data.message])
         }
 
