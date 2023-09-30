@@ -162,3 +162,5 @@ def seed_o40():
                 # Player does not exist, create a new player
                 player = Player(**player_data)
                 db.session.add(player)
+        
+        db.session.commit()
