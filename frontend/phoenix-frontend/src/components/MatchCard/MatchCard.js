@@ -12,17 +12,13 @@ export default function MatchCard({ phoenixTeam, teamData }) {
     const [activeTab, setActiveTab] = useState('Upcoming');
     const [loading, setLoading] = useState(true);
 
+    useEffect(() => {
+        if (!teamData) {
+            setLoading(true)
+        }
+        setLoading(false);
 
-    const prevData = organizeMatchData(teamData.prev_match);
-    const upcomingData = organizeMatchData(teamData.upcoming_match);
-    const mostGoalsAndAssistsData = { mostGoals: teamData.most_goals, mostAssists: teamData.most_assists };
-    const recentSeasonRecords = {
-        mostGoals: teamData.recent_goals,
-        mostAssists: teamData.recent_assists,
-        season: teamData.recent_season
-    };
-    setLoading(false);
-
+    }, [teamData])
 
     const handleTabClick = (tab) => {
         setActiveTab(tab);
@@ -68,15 +64,15 @@ export default function MatchCard({ phoenixTeam, teamData }) {
             </div>
             {/* Card Content below */}
             <div className="">
-                {upcomingData ?
+            {teamData.upcomingData !== null && teamData.upcomingData !== undefined  ?
                     <MatchCardContent
                         isActive={activeTab === 'Upcoming'}
                         phoenixLogo={logoUrl}
                         phoenixTeam={phoenixTeam}
-                        opposingTeam={upcomingData.opposingTeam.name}
-                        location={upcomingData.location}
-                        date={upcomingData.date}
-                        time={upcomingData.time}
+                        opposingTeam={teamData.upcomingData.opposingTeam.name}
+                        location={teamData.upcomingData.location}
+                        date={teamData.upcomingData.date}
+                        time={teamData.upcomingData.time}
 
                     />
                     :
@@ -88,38 +84,38 @@ export default function MatchCard({ phoenixTeam, teamData }) {
                         opposingTeam={"Unknown"}
                     />
                 }
-                {prevData ?
+                {teamData.prevData !== null && teamData.prevData !== undefined ?
                     <MatchCardContent
                         isActive={activeTab === 'Previous'}
                         loading={loading}
                         phoenixLogo={logoUrl}
                         phoenixTeam={phoenixTeam}
-                        opposingTeam={prevData.opposingTeam.name}
-                        score={prevData.score}
-                        location={prevData.location}
-                        date={prevData.date}
-                        time={prevData.time}
-                        goals={prevData.goals}
-                        loadIcon={PropagateLoader}
+                        opposingTeam={teamData.prevData.opposingTeam.name}
+                        score={teamData.prevData.score}
+                        location={teamData.prevData.location}
+                        date={teamData.prevData.date}
+                        time={teamData.prevData.time}
+                        goals={teamData.prevData.goals}
+
                     />
                     :
                     <MatchCardContent
                         isActive={activeTab === 'Previous'}
-                        loading={loading}
+                        loading={true}
                         phoenixLogo={logoUrl}
 
                     />
 
                 }
-                {mostGoalsAndAssistsData &&
+                {teamData.mostGoalsAndAssistsData !== null && teamData.mostGoalsAndAssistsData !== undefined &&
                     <PlayerStatsCardContent
                         isActive={activeTab === 'Player Stats'}
                         loading={loading}
-                        allTimeGoalScorers={mostGoalsAndAssistsData.mostGoals}
-                        allTimeAssisters={mostGoalsAndAssistsData.mostAssists}
-                        recentSeasonTopScorers={recentSeasonRecords.mostGoals}
-                        recentSeasonMostAssists={recentSeasonRecords.mostAssists}
-                        recentSeason={recentSeasonRecords.season}
+                        allTimeGoalScorers={teamData.mostGoalsAndAssistsData.mostGoals}
+                        allTimeAssisters={teamData.mostGoalsAndAssistsData.mostAssists}
+                        recentSeasonTopScorers={teamData.recentSeasonRecords.mostGoals}
+                        recentSeasonMostAssists={teamData.recentSeasonRecords.mostAssists}
+                        recentSeason={teamData.recentSeasonRecords.season}
 
                     />
 

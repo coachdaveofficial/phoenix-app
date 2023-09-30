@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from "axios";
 import Alert from '../common/Alert';
-export default function ScriptForm() {
+export default function ScriptForm({handleRefresh}) {
     
     const API_BASE_URL = 'http://127.0.0.1:8080/api'
     const INITIAL_STATE = {
@@ -32,6 +32,7 @@ export default function ScriptForm() {
                 setFormSuccessMsg([result.data.message]);
                 setFormData(INITIAL_STATE);
                 setFormErrors([]);
+                handleRefresh();
 
             }
         } catch (e) {

@@ -7,11 +7,9 @@ const teamNameClass = "mb-2 xl:text-2xl lg:text-xl md:text-lg sm:text-md xs:text
 const goalClass = "xl:text-sm sm:text-xs xs:text-xs text-center transition-scale duration-300 hover:scale-105 border p-2 m-2 rounded-md shadow-md"
 export default function MatchCardContent({ isActive, loading, children, phoenixLogo, phoenixTeam, opposingTeam, time, date, location, score, goals }) {
     let phoenixScore = '-';
-    let oppScore = '-';
-
+    let oppScore = '-';   
 
     if (score) {
-        console.log(score, "is the score for", phoenixTeam, "vs", opposingTeam, (score == 'undefined'))
         // score looks like: "1 - 1"
         // meaning Phoenix score will be position[0] and opposition will be position[3]
         phoenixScore = score[0]
