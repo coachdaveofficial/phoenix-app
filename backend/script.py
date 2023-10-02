@@ -2,6 +2,7 @@ import gspread
 import re
 from datetime import datetime
 from models import db, Player, Team, Match, Goal, Assist, PositionType, Season
+from sqlalchemy import func
 
 class SeasonDataExtractor:
     def __init__(self, service_account_file, sheet_name):
@@ -116,10 +117,18 @@ class SeasonDataExtractor:
 
     def insert_data(self, data_list):
         for data in data_list:
-            year = data['year']
-            season_name = data['season']
-            team_type = data['team_type']
-            worksheet = self.sh.worksheet(data['worksheet'])
+            try:
+                year = data['year']
+                print(year)
+                season_name = data['season']
+                team_type = data['team_type']
+            except Exception as e:
+                return {"status": {"success": False, "message": e, "worksheet_error": False}}
+            try:
+                worksheet = self.sh.worksheet(data['worksheet'])
+            except Exception as e:                
+                return {"status": {"success": False, "message": f'{e} is not a valid worksheet name', "worksheet_error": True}}
+
             worksheet_cells = worksheet.get("A1:G100")
             worksheet_data = self.extract_season_data(worksheet_cells)
 
@@ -130,7 +139,7 @@ class SeasonDataExtractor:
                 time_str = game['time']
                 match_datetime = datetime.strptime(date_str + ' ' + time_str, '%a %b %d %Y %I:%M %p')
 
-                
+                            
                 # Create or get home and away teams
                 home_team_name = game['home']
                 away_team_name = game['away']
@@ -153,21 +162,37 @@ class SeasonDataExtractor:
 
                 db.session.commit()
 
+                phoenix_id = home_team.id if home_team_name.startswith("Phoenix") else away_team.id
+
+                 # Check if the match already exists in the database by matching the date, venue, and team IDs
+                existing_match = Match.query.filter(
+                    Match.date == match_datetime,
+                    Match.venue == game['location'],
+                    Match.home_team_id == home_team.id,
+                    Match.away_team_id == away_team.id
+                ).first()
+
+                if existing_match:
+                    print(f"Match already exists: {existing_match.id}")
+                    continue
+
                 
                 season = Season.query.filter_by(name=f'{season_name} {year}').first()
                 if not season:
-                    season = Season(name=f'{season_name} {year}')
+                    season = Season(name=f'{season_name} {year}', start_date=match_datetime)
                     db.session.add(season)
-                db.session.commit()    
-                
+                db.session.commit()  
+                if season.start_date < match_datetime:  
+                    season.end_date = match_datetime
+                    db.session.commit()
                 # Create a match
                 match = Match(
-                    id=int(game['game_id']),
                     date=match_datetime,
                     venue=game['location'],
                     season_id=season.id,
                     home_team_id=home_team.id,
-                    away_team_id=away_team.id
+                    away_team_id=away_team.id,
+                    score=game['score']
                 )
                 db.session.add(match)
                 db.session.commit()
@@ -181,18 +206,35 @@ class SeasonDataExtractor:
                     print('assist', assisted_by_name)
                     print('match', match.id)
 
-                    # Get or create goal scorer
-                    goal_scorer = Player.query.filter_by(first_name=goal_scorer_name).first() or Player.query.filter_by(last_name=goal_scorer_name).first()
+                    # Convert both the goal_scorer_name and the column values to lowercase for case-insensitive matching
+                    goal_scorer_name_lower = goal_scorer_name.lower()
+
+                    goal_scorer = (
+                        Player.query
+                        .filter(func.lower(Player.first_name).ilike(goal_scorer_name_lower) |
+                                func.lower(Player.last_name).ilike(goal_scorer_name_lower))
+                        .filter(Player.team_id == phoenix_id)
+                        .first()
+                    )
                     if not goal_scorer:
-                        goal_scorer = Player(first_name=goal_scorer_name, last_name='', position=PositionType.forward, team_id=1)
+
+                        goal_scorer = Player(first_name=goal_scorer_name, last_name='', position=PositionType.forward, team_id=phoenix_id)
                         db.session.add(goal_scorer)
                         db.session.commit()
 
-                    # Get or create player who assisted the goal
-                    assisted_by = Player.query.filter_by(first_name=assisted_by_name).first() or Player.query.filter_by(last_name=assisted_by_name).first()
+                    # Convert both the assisted_by_name and the column values to lowercase for case-insensitive matching
+                    assisted_by_name_lower = assisted_by_name.lower()
+
+                    assisted_by = (
+                        Player.query
+                        .filter(func.lower(Player.first_name).ilike(assisted_by_name_lower) |
+                                func.lower(Player.last_name).ilike(assisted_by_name_lower))
+                        .filter(Player.team_id == phoenix_id)
+                        .first()
+                    )
                     if not assisted_by:
                         if assisted_by_name:
-                            assisted_by = Player(first_name=assisted_by_name, last_name='', position=PositionType.forward, team_id=1)
+                            assisted_by = Player(first_name=assisted_by_name, last_name='', position=PositionType.forward, team_id=phoenix_id)
                             db.session.add(assisted_by)
                             db.session.commit()
 
@@ -208,6 +250,7 @@ class SeasonDataExtractor:
                         db.session.commit()
 
         print("Data insertion successful!")
+        return {"status": {"success": True, "message": "Data insertion successful!"}}
 
 
     

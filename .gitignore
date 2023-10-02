@@ -1,2 +1,8 @@
 /backend/phoenix-venv
+<<<<<<< HEAD
 /backend/phoenix-fc-sheets-COPY.json
+=======
+/backend/phoenix-fc-sheets-COPY.json
+/frontend/phoenix-frontend/.env
+/backend/.env
+>>>>>>> team_data_refactor
